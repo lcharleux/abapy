@@ -1,0 +1,13 @@
+from abapy.indentation import ParamInfiniteMesh
+from copy import copy
+
+# Let's create a mesh containing a surface:
+m = ParamInfiniteMesh(Na = 2, Nb = 2)
+print m.surfaces
+elem_to_remove = copy(m.sets['top_elem'])
+# Let's remove all elements in the surface:
+for e in elem_to_remove:
+  m.drop_element(e)
+# We can see that sets and surfaces are removed when they become empty
+print m.surfaces
+

@@ -1,0 +1,36 @@
+import sys
+from abapy.postproc import GetFieldOutput as gfo
+from abapy.postproc import GetVectorFieldOutput as gvfo
+from abapy.postproc import GetTensorFieldOutput as gtfo
+from abapy.misc import dump
+from odbAccess import openOdb
+from abaqusConstants import JOB_STATUS_COMPLETED_SUCCESSFULLY
+
+
+if len(sys.argv) != 2: 
+  print 'Usage: abaqus python args.py <file_name>' 
+  sys.exit(1) 
+
+# Odb opening  
+file_name = sys.argv[1]
+odb = openOdb(file_name + '.odb')
+data = {}
+
+# Check job status:
+job_status = odb.diagnosticData.jobStatus
+
+if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
+  data['job_completed'] = True 
+  data['field_output'] = {}
+  fo = data['field_output']
+  fo['U'] = gvfo(odb, step = 'LOADING', frame = -1, instance ='I_SAMPLE', position =  'node', field = 'U') 
+  fo['S'] = gtfo(odb, step = 'LOADING', frame = -1, instance ='I_SAMPLE', position =  'node', field = 'U') 
+  fo['U_ind'] = gtfo(odb, step = 'LOADING', frame = -1, instance ='I_INDENTER', position =  'node', field = 'U') 
+
+else:
+  data['job_completed'] = False
+
+odb.close()
+dump(data, file_name+'.pckl')
+
+

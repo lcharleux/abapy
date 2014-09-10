@@ -1,0 +1,10 @@
+from abapy.misc import load
+import numpy as np
+
+# In this case, a 3D FEM simulation has beed performed and the results are stored in the file ``ContactData.pckl``. See ``Get_ContactData`` to understand how this data has been extracted from an Abaqus odb file.
+
+
+out = load('ContactData.pckl')
+cd = out[0][-1] # First step data: loading
+im = cd.export2spym()
+

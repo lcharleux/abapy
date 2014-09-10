@@ -1,0 +1,107 @@
+from abapy.mesh import RegularQuadMesh
+from matplotlib import pyplot as plt
+import numpy as np
+from copy import deepcopy
+N1, N2 = 4, 16
+l1, l2 = 1., 1.
+
+def A(N1, N2, l1, l2):
+  m = RegularQuadMesh(N1 = N1, N2 = N2, l1 = l1/4., l2 = l2)
+  def U(x,y,z,label):
+    ymax, xmax = y.max(), x.max()
+    ux = y/ymax*xmax
+    uy = 0.*x
+    uz = 0.*x
+    return ux, uy, uz
+  u = m.nodes.eval_vectorFunction(U)
+  m.nodes.apply_displacement(u)
+  m.union( m.apply_reflection(point = (l1/2., 0., 0.), normal = (1., 0., 0.) ) )
+  return m
+
+def B(N1, N2, l1, l2):
+  m = RegularQuadMesh(N1 = N1, N2 = N2, l1 = l1/4., l2 = l2)
+  m1 = RegularQuadMesh(N1 = N2, N2 = N1, l1 = 1., l2 = l2/6.)
+  def U(x, y, z, labels):
+    r0y = l2/12.
+    r0x = r0y
+    theta = np.pi * (x-.5)
+    rx = y + r0x
+    ry = y + r0y
+    ux = -x + rx * np.cos(theta)
+    uy = -y + ry * np.sin(theta)
+    uz = 0. * z
+    return ux, uy, uz
+  u = m1.nodes.eval_vectorFunction(U)
+  m1.nodes.apply_displacement(u)
+  m1.nodes.translate(x = l1/4., y = l2/4.)
+  m2 = deepcopy(m1)
+  m2.nodes.translate(y=l2/2.)
+  m.union(m1)
+  m.union(m2)
+  return m
+  
+def P(N1, N2, l1, l2):
+  m  = RegularQuadMesh(N1 = N1, N2 = N2, l1 = l1/4., l2 = l2)
+  m1 = RegularQuadMesh(N1 = N2, N2 = N1, l1 = 1., l2 = l2/6.)
+  def U(x, y, z, labels):
+    r0y = l2/12.
+    r0x = r0y
+    theta = np.pi * (x-.5)
+    rx = y + r0x
+    ry = y + r0y
+    ux = -x + rx * np.cos(theta)
+    uy = -y + ry * np.sin(theta)
+    uz = 0. * z
+    return ux, uy, uz
+  u = m1.nodes.eval_vectorFunction(U)
+  m1.nodes.apply_displacement(u)
+  m1.nodes.translate(x = l1/4., y = 3.*l2/4.)
+  m.union(m1)
+  return m
+  
+  
+def Y(N1, N2, l1, l2):
+  m =  A(N1, N2/2, l1, l2/2.)
+  m = m.apply_reflection(point = (0., l2/2., 0.), normal = (0., 1., 0.) )
+  m2 = RegularQuadMesh(N1 = 2*N1, N2 = N2/2, l1 = l1/2., l2 = l2/2.)
+  m2.nodes.translate(x=l1/4.)
+  m.union( m2 )
+  return m
+    
+mesh = A(N1, N2, l1, l2)
+temp = B(N1, N2, l1, l2)
+temp.nodes.translate(x = l1)
+mesh.union(temp)
+temp =  A(N1, N2, l1, l2)
+temp.nodes.translate(x = 1.5*l1)
+mesh.union(temp)
+temp =  P(N1, N2, l1, l2)
+temp.nodes.translate(x = 2.5*l1)
+mesh.union(temp)
+temp =  Y(N1, N2, l1, l2)
+temp.nodes.translate(x = 3.*l1)
+mesh.union(temp)
+x,y,z, tri = mesh.dump2triplot()
+
+def Field(x,y,z,labels):
+  f = y * np.sin(x * 5)
+  return f
+
+field = mesh.nodes.eval_function(Field)
+
+
+
+plt.figure(0, figsize = (12., 4.))
+plt.clf()
+plt.gca().set_aspect('equal')
+#plt.axis('off')
+plt.grid()
+plt.triplot(x,y,tri, 'k-', linewidth = .5)
+xe,ye,ze = mesh.get_border()
+plt.plot(xe,ye,'k-', linewidth =3.)
+plt.tricontourf(x,y,tri, field.data, 10)
+plt.tricontour(x,y,tri, field.data, 10, colors = 'black', linewidth= 1.)
+xlim, ylim, zlim = mesh.nodes.boundingBox()
+plt.xlim(xlim)
+plt.ylim(ylim)
+plt.show()

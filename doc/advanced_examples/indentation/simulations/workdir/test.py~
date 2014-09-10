@@ -1,0 +1,19 @@
+import numpy as np
+from abapy.postproc import HistoryOutput
+x_position = s.contact_data['x_position']
+pres = s.contact_data['contact_pressure']
+time = [s.contact_data['time'][1]]
+c_radius = []
+'''
+for n_step in xrange(len(pres)):
+  x = x_position[n_step]
+  p = pres[n_step]
+  r = [x[i][ np.where(p[i]>0.)[0][-1]] for i in xrange(len(p))] 
+  c_radius.append(r)
+'''
+x = x_position[1]
+p = pres[1]
+r = [x[i][ np.where(p[i]>0.)[0][-1]] for i in xrange(len(p))] 
+c_radius.append(r)
+contact_area = HistoryOutput(time = time, data = c_radius)[1]**2 * np.pi
+#contact_area = contact_area.average()

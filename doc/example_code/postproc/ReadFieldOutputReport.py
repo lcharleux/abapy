@@ -1,0 +1,4 @@
+from abapy.postproc import ReadFieldOutputReport
+report_name = 'indentation_core_step0_frame1_S11_nodes.rpt'
+S11 = ReadFieldOutputReport(report_name, position = 'nodes', dti = 'I', dtf = 'f')
+print S11

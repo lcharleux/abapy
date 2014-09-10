@@ -1,0 +1,8 @@
+from abapy.postproc import HistoryOutput_test
+time = [ [1., 2.,3.] , [3.,4.,5.] , [5.,6.,7.] ]
+data = [ [2.,2.,2.] , [3.,3.,3.] , [4.,4.,4.] ]
+N = 10000
+time = [ range(N), range(N), range(N) ]
+data = [ range(N), range(N), range(N) ]
+Force = HistoryOutput_test(time, data)
+Force + Force

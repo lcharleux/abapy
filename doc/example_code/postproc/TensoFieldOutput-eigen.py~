@@ -1,0 +1,12 @@
+from abapy.postproc import FieldOutput, TensorFieldOutput, VectorFieldOutput, Identity_like
+data12 = [1., 2., 0.]
+data11 = [0., 0., 1.]
+data22 = [0., 0., -1]
+labels = range(1,len(data11)+1)
+fo12 = FieldOutput(labels = labels, data=data12,position='node')
+fo11 = FieldOutput(labels = labels, data=data11,position='node')
+fo22 = FieldOutput(labels = labels, data=data22,position='node')
+vector = VectorFieldOutput(data1 = fo2)
+tensor = TensorFieldOutput(data11 = fo1, data22 = fo2 )
+tensor2 = TensorFieldOutput(data33= fo2 )
+t1, t2, t3, v1, v2, v3 = tensor2.eigen()

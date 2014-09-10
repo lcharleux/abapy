@@ -1,0 +1,43 @@
+# Do not delete the following import lines
+from abaqus import *
+from abaqusConstants import *
+import __main__
+
+def Macro1():
+    import section
+    import regionToolset
+    import displayGroupMdbToolset as dgm
+    import part
+    import material
+    import assembly
+    import step
+    import interaction
+    import load
+    import mesh
+    import job
+    import sketch
+    import visualization
+    import xyPlot
+    import displayGroupOdbToolset as dgo
+    import connectorBehavior
+    o1 = session.openOdb(
+        name='/home/lcharleux/Documents/Prog/modules/python/testing/vonmises/workdir/VonMises_1.odb')
+    session.viewports['Viewport: 1'].setValues(displayedObject=o1)
+    dg = session.viewports['Viewport: 1'].odbDisplay.displayGroup
+    dg = session.DisplayGroup(name='DisplayGroup-3', objectToCopy=dg)
+    session.viewports['Viewport: 1'].odbDisplay.setValues(visibleDisplayGroups=(dg, 
+        ))
+    session.viewports['Viewport: 1'].odbDisplay.displayGroupInstances['DisplayGroup-3'].setValues(
+        lockOptions=OFF)
+    dg1= session.displayGroups['DisplayGroup-3']
+    session.viewports['Viewport: 1'].odbDisplay.setValues(visibleDisplayGroups=(
+        dg1, ))
+    session.viewports['Viewport: 1'].odbDisplay.display.setValues(plotState=(
+        CONTOURS_ON_DEF, ))
+    odb = session.odbs['/home/lcharleux/Documents/Prog/modules/python/testing/vonmises/workdir/VonMises_1.odb']
+    session.writeFieldReport(fileName='abaqus2.rpt', append=OFF, 
+        sortItem='Node Label', odb=odb, step=2, frame=1, 
+        outputPosition=ELEMENT_NODAL, variable=(('S', ELEMENT_NODAL, ((
+        COMPONENT, 'S11'), )), ))
+
+

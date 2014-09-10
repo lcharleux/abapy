@@ -1,0 +1,21 @@
+from abapy.postproc import FieldOutput, TensorFieldOutput, VectorFieldOutput
+data11 = [1., 1., 1.]
+data22 = [2., 4., -1]
+data12 = [1., 2., 0.]
+labels = range(1,len(data11)+1)
+fo11 = FieldOutput(labels = labels, data=data11,position='node')
+fo22 = FieldOutput(labels = labels, data=data22,position='node')
+fo12 = FieldOutput(labels = labels, data=data12,position='node')
+tensor = TensorFieldOutput(data11 = fo11, data22 = fo22, data12 = fo12 )
+tensor2 = TensorFieldOutput(data11= fo22 )
+tensor
+print tensor
+print tensor[1,2] 
+print tensor *2. + 1.
+print tensor ** 2 # Piecewise power
+vector = VectorFieldOutput(data1 = fo11)
+print tensor * vector # Matrix product
+print tensor * tensor2 # Contracted tensor product
+ 
+
+
