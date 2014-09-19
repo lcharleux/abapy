@@ -1,1 +1,4 @@
 makedoc/
+*~
+*.pyc
+doc/_build/*
