@@ -1,0 +1,40 @@
+********************************************************************************
+Field Output Report, written Fri Apr 27 10:07:54 2012
+
+Source 1
+---------
+
+   ODB: /home/lcharleux/Documents/Prog/modules/python/abapy/doc/example_code/postproc/indentation.odb
+   Step: LOADING0
+   Frame: Increment     10: Step Time =    1.000
+
+Loc 1 : Nodal values from source 1
+
+Output sorted by column "Node Label".
+
+Field Output reported at nodes for part: I_SAMPLE
+
+            Node     U.Magnitude
+           Label          @Loc 1
+---------------------------------
+               1     1.05148E-03
+               2     1.13341E-03
+               3     876.270E-06
+               4     9.25063E-03
+               5     2.47138E-03
+               6     644.116E-06
+               7        125.E-03
+               8     28.3573E-03
+               9     1.48275E-03
+              11     433.768E-06
+              12     252.288E-06
+              14     592.127E-06
+              15     269.859E-06
+              17     356.175E-06
+              18     297.337E-06
+              25     359.734E-06
+              26     325.693E-06
+              28     633.606E-06
+              29     536.086E-06
+
+

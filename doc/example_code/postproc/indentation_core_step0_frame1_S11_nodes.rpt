@@ -1,0 +1,43 @@
+********************************************************************************
+Field Output Report, written Fri Apr 27 10:07:38 2012
+
+Source 1
+---------
+
+   ODB: /home/lcharleux/Documents/Prog/modules/python/abapy/doc/example_code/postproc/indentation.odb
+   Step: LOADING0
+   Frame: Increment     10: Step Time =    1.000
+
+Loc 1 : Nodal values from source 1
+
+Output sorted by column "Node Label".
+
+Field Output reported at nodes for region: I_SAMPLE.Region_1
+   Computation algorithm: EXTRAPOLATE_COMPUTE_AVERAGE
+   Averaged at nodes
+   Averaging regions: ODB_REGIONS
+
+            Node           S.S11
+           Label          @Loc 1
+---------------------------------
+               1     1.09260E-03
+               2    -220.352E-06
+               3    -490.897E-06
+               4    -1.62646E-03
+               5    -3.17961E-03
+               6    -1.24735E-03
+               7    -5.95788E-03
+               8    -4.98278E-03
+               9    -594.455E-06
+              11    -15.4724E-06
+              12    -31.4269E-06
+              14    -200.636E-06
+              15    -53.2875E-06
+              17    -399.030E-06
+              18    -28.0754E-06
+              25     25.7775E-06
+              26     5.41486E-06
+              28     66.3944E-06
+              29     54.0360E-06
+
+

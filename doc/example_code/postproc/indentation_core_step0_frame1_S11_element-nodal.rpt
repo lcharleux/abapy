@@ -1,0 +1,72 @@
+********************************************************************************
+Field Output Report, written Fri Apr 27 10:07:47 2012
+
+Source 1
+---------
+
+   ODB: /home/lcharleux/Documents/Prog/modules/python/abapy/doc/example_code/postproc/indentation.odb
+   Step: LOADING0
+   Frame: Increment     10: Step Time =    1.000
+
+Loc 1 : Element nodal values from source 1 ( Average criteria = 75%, Not averaged across region boundaries )
+
+Output sorted by column "Node Label".
+
+Field Output reported at element nodes for region: I_SAMPLE.Region_1
+   Computation algorithm: EXTRAPOLATE_COMPUTE_AVERAGE
+   Averaged at nodes
+   Averaging regions: ODB_REGIONS
+
+         Element            Node           S.S11
+           Label           Label          @Loc 1
+-------------------------------------------------
+               1               1     1.09260E-03
+              13               1     1.09260E-03
+               1               2    -220.352E-06
+               2               2    -220.352E-06
+              13               2    -220.352E-06
+              14               2    -220.352E-06
+               2               3    -490.897E-06
+               5               3    -490.897E-06
+              14               3    -490.897E-06
+               1               4    -1.62646E-03
+               3               4    -1.62646E-03
+               1               5    -651.646E-06
+               2               5    -2.03273E-03
+               3               5    -8.96446E-03
+               4               5    -1.06962E-03
+               2               6    -1.24735E-03
+               4               6    -1.24735E-03
+               5               6    -1.24735E-03
+               7               6    -1.24735E-03
+               3               7    -5.95788E-03
+               3               8    -4.98278E-03
+               4               8    -4.98278E-03
+               4               9    -594.455E-06
+               7               9    -594.455E-06
+               5              11    -15.4724E-06
+               6              11    -15.4724E-06
+              12              11    -15.4724E-06
+              14              11    -15.4724E-06
+               6              12    -31.4269E-06
+              12              12    -31.4269E-06
+               5              14    -200.636E-06
+               6              14    -200.636E-06
+               7              14    -200.636E-06
+               8              14    -200.636E-06
+               6              15    -53.2875E-06
+               8              15    -53.2875E-06
+               7              17    -399.030E-06
+               8              17    -399.030E-06
+               8              18    -28.0754E-06
+              11              25     25.7775E-06
+              11              26     5.41486E-06
+              12              26     5.41486E-06
+              11              28     66.3944E-06
+              13              28     66.3944E-06
+              11              29     54.0360E-06
+              12              29     54.0360E-06
+              13              29     54.0360E-06
+              14              29     54.0360E-06
+
+
