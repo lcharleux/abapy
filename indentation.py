@@ -1675,6 +1675,7 @@ class Manager:
     p = subprocess.Popen( '{0} job={1} input={1}.inp interactive'.format(self.abqlauncher, self.simname), cwd = self.workdir, shell=True, stdout = subprocess.PIPE)
     trash = p.communicate()
     t1 = time.time()
+    self.duration = t1 - t0
     print '< Ran {0} in Abaqus: duration {1:.2f}s>'.format(self.simname, t1 - t0)   
   
   def __repr__(self): 
