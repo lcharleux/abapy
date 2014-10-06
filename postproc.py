@@ -921,6 +921,8 @@ def MakeFieldOutputReport(odb, instance, step, frame, report_name, original_posi
   if original_position == 'INTEGRATION_POINT': original_abqposition = INTEGRATION_POINT
   if original_position == 'NODAL': original_abqposition = NODAL
   if original_position == 'WHOLE_ELEMENT': original_abqposition = WHOLE_ELEMENT
+  if original_position == 'ELEMENT_NODAL': original_abqposition = ELEMENT_NODAL
+  print original_position
   if new_position == 'NODAL':
     new_abqposition = NODAL
     sortItem = 'Node Label'
