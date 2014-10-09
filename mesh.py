@@ -1843,6 +1843,7 @@ class Mesh:
     >>> plt.triplot(x,y,tri)
     >>> plt.show()'''
     from array import array
+    import numpy as np
     from copy import copy
     dti = self.dti
     m3 = self.convert2tri3()
@@ -1854,7 +1855,7 @@ class Mesh:
       for n in t0:
         t.append(ni(n))
       c.append(copy(t))
-    return m3.nodes.x, m3.nodes.y, m3.nodes.x, c
+    return np.array(m3.nodes.x), np.array(m3.nodes.y), np.array(m3.nodes.x), np.array(c)
   
   def replace_node(self, old, new):
     '''
