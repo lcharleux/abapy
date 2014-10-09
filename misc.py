@@ -3,16 +3,17 @@ Miscellaneous
 =============
 '''
 
-import cPickle
+import pickle
 import copy_reg
 import array
 
+"""
 def array_unpickler(data):
     return array.array(data[0], data[1:])
 def array_pickler(arr):
     return array_unpickler, ("%s%s" % (arr.typecode, arr.tostring()),)
 copy_reg.pickle(array.ArrayType, array_pickler, array_unpickler)
-
+"""
 
 def load(name):
   '''
@@ -24,8 +25,8 @@ def load(name):
   
   .. note:: This function allows clean array unpickling whereas standard ``pickle.load`` will raise an error if ``array.array`` are in the pickled object (which is the case of all objects in Abapy).
   '''
-  f = open(name, 'r')
-  out = cPickle.load(f)
+  f = open(name, 'rb')
+  out = pickle.load(f)
   f.close()
   return out
 
@@ -40,8 +41,8 @@ def dump(data,name,protocol = 2):
   
   .. note:: This function allows clean array pickling whereas standard ``pickle.dump`` will raise an error if ``array.array`` are in the pickled object (which is the case of all objects in Abapy).
   '''
-  f = open(name,'w')
-  cPickle.dump(data,f,protocol)
+  f = open(name,'wb')
+  pickle.dump(data,f,protocol)
   f.close()
 
 
