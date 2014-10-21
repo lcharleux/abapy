@@ -185,19 +185,20 @@ class Hollomon:
   '''
   def __init__(self, labels='mat', E = 1., nu = 0.3, sy = 0.01, n = 0.2, dtf='d'):
     from array import array
+    import numpy
     if type(labels) is str: labels=[labels]
     self.labels=labels
     l = len(labels)
-    if type(E) in [float, int, long]: E=[E]
+    if type(E) in [float, int, long, numpy.float64]: E=[E]
     if len(E) != l: raise Exception, 'Parameters must all have the same length'
     self.E=array(dtf,E)
-    if type(nu) in [float, int, long]: nu=[nu]
+    if type(nu) in [float, int, long, numpy.float64]: nu=[nu]
     if len(nu) != l: raise Exception, 'Parameters must all have the same length'
     self.nu=array(dtf,nu)  
-    if type(sy) in [float, int, long]: sy=[sy]
+    if type(sy) in [float, int, long, numpy.float64]: sy=[sy]
     if len(sy) != l: raise Exception, 'Parameters must all have the same length'
     self.sy=array(dtf,sy)
-    if type(n) in [float, int, long]: n=[n]
+    if type(n) in [float, int, long, numpy.float64]: n=[n]
     if len(n) != l: raise Exception, 'Parameters must all have the same length'
     self.n=array(dtf,n)
   def __repr__(self):
