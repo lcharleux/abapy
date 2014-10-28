@@ -1965,49 +1965,59 @@ class ContactData:
     '''
     
     import numpy as np
-    
-    # Computing Triangle Area
-    def triangle_area(points,conn):
-      x, y = points[:,0], points[:,1]
-      area = 0. * np.arange(len(conn))
-      for i in xrange(len(conn)):
-        tri = conn[i]
-        xt = x[tri]
-        yt = y[tri]
-        xb, xc = xt[1] - xt[0],  xt[2] - xt[0]
-        yb, yc = yt[1] - yt[0],  yt[2] - yt[0]
-        area[i] = .5 * abs( xb * yc - xc * yb )
-      return area    
-    
-    # Computing numerical 2D integration
-    def triangle_integration(conn, areas, field, coeffs = [0., 1./3., 2./3., 1.]):
-      out = 0.
-      for i in xrange(len(conn)):
-        tri = conn[i]
-        area = areas[i]
-        f = field[tri].sum()
-        out += coeffs[f] * area 
-      return out
-    
-    # Computing the area of all triangle where all summits have a non zero pressure
-    def triangle_non_zero(conn, areas, field):
-      out = 0.
-      for i in xrange(len(conn)):
-        tri = conn[i]
-        area = areas[i]
-        f = field[tri]
-        out += int(f.sum() / 3.) * area
-      return out
-    
-    points, alt, press, conn = self.get_3D_data(delaunay_disp = delaunay_disp)
-    areas = triangle_area(points,conn)
-    norm_press = (press > 0.) + 0
-    #out1 = triangle_integration(conn, areas, norm_press, coeffs = [0., 0., 0., 1.])
-    out1 = triangle_integration(conn, areas, norm_press, coeffs = [0., 1./3., 2./3., 1.])
-    #out2 = triangle_integration(conn, areas, norm_press, coeffs = [0., 1., 1., 1.])
-    #out = triangle_non_zero(conn, areas, norm_press)
-    #return np.array([out0, out1, out2])
-    return out1
+    if self.is_3D: 
+      # Computing Triangle Area
+      def triangle_area(points,conn):
+        x, y = points[:,0], points[:,1]
+        area = 0. * np.arange(len(conn))
+        for i in xrange(len(conn)):
+          tri = conn[i]
+          xt = x[tri]
+          yt = y[tri]
+          xb, xc = xt[1] - xt[0],  xt[2] - xt[0]
+          yb, yc = yt[1] - yt[0],  yt[2] - yt[0]
+          area[i] = .5 * abs( xb * yc - xc * yb )
+        return area    
+      
+      # Computing numerical 2D integration
+      def triangle_integration(conn, areas, field, coeffs = [0., 1./3., 2./3., 1.]):
+        out = 0.
+        for i in xrange(len(conn)):
+          tri = conn[i]
+          area = areas[i]
+          f = field[tri].sum()
+          out += coeffs[f] * area 
+        return out
+      
+      # Computing the area of all triangle where all summits have a non zero pressure
+      def triangle_non_zero(conn, areas, field):
+        out = 0.
+        for i in xrange(len(conn)):
+          tri = conn[i]
+          area = areas[i]
+          f = field[tri]
+          out += int(f.sum() / 3.) * area
+        return out
+      
+      points, alt, press, conn = self.get_3D_data(delaunay_disp = delaunay_disp)
+      areas = triangle_area(points,conn)
+      norm_press = (press > 0.) + 0
+      #out1 = triangle_integration(conn, areas, norm_press, coeffs = [0., 0., 0., 1.])
+      out1 = triangle_integration(conn, areas, norm_press, coeffs = [0., 1./3., 2./3., 1.])
+      #out2 = triangle_integration(conn, areas, norm_press, coeffs = [0., 1., 1., 1.])
+      #out = triangle_non_zero(conn, areas, norm_press)
+      #return np.array([out0, out1, out2])
+      return out1
+    else:
+      r = np.array(self.coor1)
+      p = np.array(self.pressure)
+      loc = r.argsort()
+      r = r[loc]
+      p = p[loc]
+      loc = np.where(p !=0.)[0].max()
+      rc = r[loc]
+      Ac = np.pi * rc**2  
+      return Ac
     
   def contact_contour(self, delaunay_disp = None):
     '''
