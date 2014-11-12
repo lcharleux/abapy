@@ -1101,7 +1101,11 @@ def GetFieldOutput_byRpt(odb, instance, step, frame, original_position, new_posi
     position = position,
     dti = dti,
     dtf = dtf)
-  if delete_report: os.system('rm ' + report_name)
+  if delete_report:
+    try: 
+      os.remove(report_name)
+    except:
+      pass  
   return field
 
 def GetVectorFieldOutput_byRpt(odb, instance, step, frame, original_position, new_position, position, field, sub_set_type = None, sub_set = None, report_name = 'dummy.rpt', dti= 'I', dtf = 'f', delete_report = True):
