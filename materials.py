@@ -210,7 +210,7 @@ class Hollomon:
     sy = float_arg(sy)
     if len(sy) != l: raise Exception, 'Parameters must all have the same length'
     self.sy=array(dtf,sy)
-    n = floa_arg(n)
+    n = float_arg(n)
     if len(n) != l: raise Exception, 'Parameters must all have the same length'
     self.n=array(dtf,n)
   def __repr__(self):
