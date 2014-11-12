@@ -3,7 +3,16 @@ Materials
 =========
 '''
 
-FLOAT_TYPES = [float, int, long, numpy.float64]
+def float_arg(arg):
+  """
+  Tests if an arg is float or convertible to float
+  """
+  try:
+    arg = [float(arg)]
+  except:
+    pass
+  return arg    
+  
 
 class VonMises:
   ''' 
@@ -33,13 +42,13 @@ class VonMises:
     if type(labels) is str: labels=[labels]
     self.labels=labels
     l = len(labels)
-    if type(E) in FLOAT_TYPES : E=[E]
+    E = float_arg(E)
     if len(E) != l: raise Exception, 'Parameters must all have the same length'
     self.E=array(dtf,E)
-    if type(nu) in FLOAT_TYPES : nu=[nu]
+    nu = float_arg(nu)
     if len(nu) != l: raise Exception, 'Parameters must all have the same length'
     self.nu=array(dtf,nu)  
-    if type(sy) in FLOAT_TYPES : sy=[sy]
+    sy = float_arg(sy)
     if len(sy) != l: raise Exception, 'Parameters must all have the same length'
     self.sy=array(dtf,sy)
   def __repr__(self):
@@ -73,10 +82,10 @@ class Elastic:
     if type(labels) is str: labels=[labels]
     self.labels=labels
     l = len(labels)
-    if type(E) in FLOAT_TYPES : E=[E]
+    E = float_arg(E)
     if len(E) != l: raise Exception, 'Parameters must all have the same length'
     self.E=array(dtf,E)
-    if type(nu) in FLOAT_TYPES : nu=[nu]
+    nu = float_arg(nu)
     if len(nu) != l: raise Exception, 'Parameters must all have the same length'
     self.nu=array(dtf,nu)  
   def __repr__(self):
@@ -123,23 +132,23 @@ class DruckerPrager:
     if type(labels) is str: labels=[labels]
     self.labels=labels
     l = len(labels)
-    if type(E) in FLOAT_TYPES : E=[E]
+    E = float_arg(E)
     if len(E) != l: raise Exception, 'Parameters must all have the same length'
     self.E=array(dtf,E)
-    if type(nu) in FLOAT_TYPES : nu=[nu]
+    nu = float_arg(nu)
     if len(nu) != l: raise Exception, 'Parameters must all have the same length'
     self.nu=array(dtf,nu)  
-    if type(sy) in FLOAT_TYPES : sy=[sy]
+    sy = float_arg(sy)
     if len(sy) != l: raise Exception, 'Parameters must all have the same length'
     self.sy=array(dtf,sy)
-    if type(beta) in FLOAT_TYPES : beta=[beta]
+    beta = float_arg(beta)
     if len(beta) != l: raise Exception, 'Parameters must all have the same length'
     self.beta = array(dtf,beta)
     if psi == None: psi = beta
-    if type(psi) in FLOAT_TYPES : psi=[psi]
+    psi = float_arg(psi)
     if len(psi) != l: raise Exception, 'Parameters must all have the same length'
     self.psi = array(dtf,psi)
-    if type(k) in FLOAT_TYPES : k=[k]
+    k = float_arg(k)
     if len(k) != l: raise Exception, 'Parameters must all have the same length'
     self.k = array(dtf,k)
   
@@ -192,16 +201,16 @@ class Hollomon:
     if type(labels) is str: labels=[labels]
     self.labels=labels
     l = len(labels)
-    if type(E) in FLOAT_TYPES : E=[E]
+    E = float_arg(E)
     if len(E) != l: raise Exception, 'Parameters must all have the same length'
     self.E=array(dtf,E)
-    if type(nu) in FLOAT_TYPES : nu=[nu]
+    nu = float_arg(nu)
     if len(nu) != l: raise Exception, 'Parameters must all have the same length'
     self.nu=array(dtf,nu)  
-    if type(sy) in FLOAT_TYPES : sy=[sy]
+    sy = float_arg(sy)
     if len(sy) != l: raise Exception, 'Parameters must all have the same length'
     self.sy=array(dtf,sy)
-    if type(n) in FLOAT_TYPES : n=[n]
+    n = floa_arg(n)
     if len(n) != l: raise Exception, 'Parameters must all have the same length'
     self.n=array(dtf,n)
   def __repr__(self):
