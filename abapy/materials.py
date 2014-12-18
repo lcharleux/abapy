@@ -14,7 +14,7 @@ def float_arg(arg):
   return arg    
   
 
-class VonMises:
+class VonMises(object):
   ''' 
   Represents von Mises materials used for FEM simulations
   
@@ -65,7 +65,7 @@ class VonMises:
       out += pattern.format(self.labels[i],self.E[i],self.nu[i],self.sy[i])
     return out[0:-1]
 
-class Elastic:
+class Elastic(object):
   ''' 
   Represents an istotrop linear elastic material used for FEM simulations
   
@@ -103,7 +103,7 @@ class Elastic:
     return out[0:-1]
 
 
-class DruckerPrager:
+class DruckerPrager(object):
   ''' 
   Represents Drucker-Prager materials used for FEM simulations
   
@@ -174,7 +174,7 @@ class DruckerPrager:
         self.sy[i])
     return out[0:-1]
     
-class Hollomon:
+class Hollomon(object):
   ''' 
   Represents von Hollom materials (i. e. power law haderning and von mises yield criterion) used for FEM simulations.
   
@@ -262,4 +262,61 @@ class Hollomon:
     
     
     
+class Bilinear(object):
+  ''' 
+  Represents von Mises materials used for FEM simulations
+  
+  :param E: Young's modulus.
+  :type E: float, list, array.array
+  :param nu: Poisson's ratio.
+  :type nu: float, list, array.array
+  :param Ssat: Saturation stress.
+  :type Ssat: float, list, array.array
+  :param n: Slope of the first linear plastic law
+  :type n: float, list, array.array
+  :param Sy: Stress at zero plastic strain
+  :type Sy: float, list, array.array
+  
+  .. note:: 
+     All inputs must have the same length or an exception will be raised.
+     
+  '''
+  def __init__(self, labels='mat', E = 1., nu = 0.3, Ssat = 1000., n=100., sy=100. ,dtf='d'):
+    from array import array
+    import numpy
     
+    if type(labels) is str: labels=[labels]
+    self.labels=labels
+    l = len(labels)
+    E = float_arg(E)
+    if len(E) != l: raise Exception, 'Parameters must all have the same length'
+    self.E=array(dtf,E)
+    nu = float_arg(nu)
+    if len(nu) != l: raise Exception, 'Parameters must all have the same length'
+    self.nu=array(dtf,nu)  
+    Ssat = float_arg(Ssat)
+    if len(Ssat) != l: raise Exception, 'Parameters must all have the same length'
+    self.Ssat=array(dtf,Ssat)
+    n = float_arg(n)
+    if len(n) != l: raise Exception, 'Parameters must all have the same length'
+    self.n=array(dtf,n)
+    sy = float_arg(sy)
+    if len(sy) != l: raise Exception, 'Parameters must all have the same length'
+    self.sy=array(dtf,sy)    
+    
+  def __repr__(self):
+    return '<Bilinear instance: {0} samples>'.format(len(self.E))
+  
+  def dump2inp(self):
+    '''
+    Returns materials in INP format suitable with abaqus input files.
+    
+    :rtype: string
+    '''
+    out = '** {0}\n'.format(self.__repr__())
+    pattern = '*MATERIAL, NAME={0}\n*ELASTIC\n  {1}, {2}\n*PLASTIC\n  {3}, 0.\n {4}, {5}'
+    Eps_p_sat=[]
+    for i in xrange(len(self.E)):
+      Eps_p_sat.append((self.Ssat[i] - self.sy[i])/self.n[i])
+      out += pattern.format(self.labels[i],self.E[i],self.nu[i],self.sy[i], self.Ssat[i], Eps_p_sat[i])
+    return out[0:-1]    
