@@ -1,0 +1,6 @@
+matplotlib>=1.1.1rc
+numpy>=1.6.1
+scipy>=0.9.0
+ipython>=0.12.1
+
+

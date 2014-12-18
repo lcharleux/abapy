@@ -2,3 +2,5 @@ makedoc/
 *~
 *.pyc
 doc/_build/*
+*.pdf
+*.rpy
