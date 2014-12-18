@@ -12,7 +12,7 @@ print vector[1,4,6] # Picking label by label
 print vector[1:6:2] # Slicing
 vector.get_data(6) # Returns 3 floats
 vector.norm() # Returns norm
-vector.sum_coord() # returns the sum of coords
+vector.sum() # returns the sum of coords
 vector * vector2 # Itemwise product (like numpy, unlike matlab)
 vector.dot(vector2) # Dot/Scalar product
 vector.cross(vector2) # Cross/Vector product

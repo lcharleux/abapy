@@ -10,8 +10,8 @@ setup(name='abapy',
       packages=['abapy'],
       zip_safe=False,
       install_requires=[
-          'numpy',
-          'scipy'
-          
+          "numpy",
+          "scipy",
+          "matplotlib"
           ],
       )

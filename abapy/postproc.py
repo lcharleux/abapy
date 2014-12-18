@@ -35,7 +35,6 @@ def GetMesh(odb,instance,dti='I'):
   for node in inst.nodes:
     c = node.coordinates
     l = node.label
-    #print l, c
     nodes.add_node(l,c[0],c[1],c[2])
   for nsk in inst.nodeSets.keys():
     nset = inst.nodeSets[nsk].nodes
@@ -62,7 +61,7 @@ def GetMesh(odb,instance,dti='I'):
 
 
 
-class HistoryOutput:
+class HistoryOutput(object):
   ''' Stores history output data from and allows useful operations. The key idea of this class is to allow easy storage of time dependant data without merging steps to allow further separating of each test steps (loading, unloading,...). The class allows additions, multiplication, ... between class instances and between class instances and int/floats. These operations only affect y data as long as time has no reason to be affected. 
   
   :param time: time represented by nested lists, each one corresponding to a step.
@@ -751,7 +750,7 @@ def GetVectorFieldOutput(odb, step, frame, instance, position, field, labels=Non
     Field.append( GetFieldOutput(odb, step = step, frame = frame, instance = instance, position =  position , field = field, subField= components[ncomp], labels = labels, dti = dti )  )
   if len(Field) == 2:
     return VectorFieldOutput(position = position, data1 = Field[0],  data2 = Field[1])  
-  if len(Field) == 2:
+  if len(Field) == 3:
     return VectorFieldOutput(position = position, data1 = Field[0],  data2 = Field[1], data3 = Field[2])  
 
 
@@ -922,7 +921,6 @@ def MakeFieldOutputReport(odb, instance, step, frame, report_name, original_posi
   if original_position == 'NODAL': original_abqposition = NODAL
   if original_position == 'WHOLE_ELEMENT': original_abqposition = WHOLE_ELEMENT
   if original_position == 'ELEMENT_NODAL': original_abqposition = ELEMENT_NODAL
-  print original_position
   if new_position == 'NODAL':
     new_abqposition = NODAL
     sortItem = 'Node Label'
@@ -946,7 +944,6 @@ def MakeFieldOutputReport(odb, instance, step, frame, report_name, original_posi
       sub_field_type = INVARIANT
       sub_field_flag = sub_field
     variable.append( ( (sub_field_type, sub_field_flag) , ) )  
-  #print variable  
   if sub_set == None:
     leaf = dgo.LeafFromPartInstance(instance)
   else:
@@ -1199,7 +1196,6 @@ def GetVectorFieldOutput_byRpt(odb, instance, step, frame, original_position, ne
     stepLabel = step # Merci Jonathan !
   componentLabels = odb.steps[stepLabel].frames[frame].fieldOutputs[field].componentLabels
   if len(componentLabels) == 3:
-     
     field3 =GetFieldOutput_byRpt(
     odb = odb, 
     instance = instance, 
@@ -1411,7 +1407,7 @@ def GetTensorFieldOutput_byRpt(odb, instance, step, frame, original_position, ne
       dtf = dtf)
   return tensor_field
   
-class FieldOutput:
+class FieldOutput(object):
   '''
   Scalar output representing a field evaluated on nodes or elements referenced by their labels. A FieldOutput instance cannot be interpreted with its mesh. On initiation, labels and data will be reordered to have labels sorted. 
  
@@ -1940,8 +1936,10 @@ class VectorFieldOutput:
     data = [data1, data2, data3]
     isNone = [data1 == None, data2 == None, data3 == None]
     for d in data:
-      if isinstance(d,FieldOutput) == False and d != None:
+      if (isinstance(d,FieldOutput) == False) and (d != None):
         raise Exception, 'data1, data2 and data3 must be FieldOutput instances.'
+    
+    # Remove comments when python 2.4 is not used anymore
     if isNone != [True, True, True]:
       for i in [2,1,0]:
         d = data[i]
@@ -2345,7 +2343,7 @@ class TensorFieldOutput:
     data = [data11, data22, data33, data12, data13, data23]
     isNone = [data11 == None, data22 == None, data33 == None, data12 == None, data13 == None, data23 == None]
     for d in data:
-      if isinstance(d,FieldOutput) == False and d != None:
+      if (isinstance(d,FieldOutput) == False) and (d != None):
         raise Exception, 'data11, data22, data33, data12, data13 and data23 must be FieldOutput instances.'
     if isNone != [True, True, True, True, True, True]:
       for i in [5,4,3,2,1,0]:
