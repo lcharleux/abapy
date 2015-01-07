@@ -827,7 +827,7 @@ def MakeFieldOutputReport(odb, instance, step, frame, report_name, original_posi
   
   
   All examples below are performed on a small indentation ODB: 
-  :download:`indentation.odb <example_code/postproc/indentation.odb>`
+  
   
   >>> from odbAccess import openOdb
   >>> from abapy.postproc import MakeFieldOutputReport
