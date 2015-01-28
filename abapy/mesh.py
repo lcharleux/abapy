@@ -1005,7 +1005,7 @@ class Mesh:
     
     # inputs processing
     if label in self.labels: 
-      print 'Info: node {0} already exists, nothing changed.'.format(label)
+      print 'Info: element {0} already exists, nothing changed.'.format(label)
       return
     else:
       if len(self.labels) == 0:
@@ -2008,6 +2008,86 @@ class Mesh:
     for c in out.connectivity: c.reverse()
     return out
        
+  def centroids(self):
+    """
+    Returns a dictionnary containing the coordinates of all the nodes belonging to earch element.
+    """
+    import numpy as np
+    nodes = self.nodes
+    conn = self.connectivity
+    space = self.space
+    
+    def tri_area(vertices):
+      u = vertices[0]
+      v = vertices[1]
+      w = vertices[2]
+      return np.linalg.norm(np.cross( v-u, w-u)) / 2.
+    
+    def tetra_area(vertices):
+      u = vertices[0]
+      v = vertices[1]
+      w = vertices[2]
+      x = vertices[3]
+      return abs(np.cross(v-u, w-u).dot(x-u)) / 6. 
+    
+    def simplex_centroid(vertices):
+      return vertices.sum(axis = 0) / len(vertices)
+    
+    
+
+
+    centroids = np.zeros([len(conn), 3])
+    for n in xrange(len(conn)):
+      c = conn[n]
+      s = space[n]
+      vertices = np.zeros([len(c), 3])
+      for i in xrange(len(c)):
+        loc = nodes.labels.index(c[i])
+        vertices[i,0] = nodes.x[loc]
+        vertices[i,1] = nodes.y[loc]
+        vertices[i,2] = nodes.z[loc]
+        
+      if s == 2: # 2D
+        if len(c) == 3:  # Triangle
+          centroids[n] = simplex_centroid(vertices)
+        if len(c) == 4:  # Quadrangle
+          t0 =  vertices[[0,1,2]]
+          t1 =  vertices[[2,3,0]] 
+          a0 = tri_area(t0)  
+          a1 = tri_area(t1)
+          c0 = simplex_centroid(t0)
+          c1 = simplex_centroid(t1)
+          centroids[n] = (c0 * a0 + c1 * a1) / (a0 + a1)   
+      if s == 3: # 3D
+        if len(c) == 4: # Tretrahedron
+          centroids[n] = simplex_centroid(vertices)
+        if len(c) == 6: #Prism
+          t0 =  vertices[[0,1,2,3]]
+          t1 =  vertices[[1,2,3,4]]
+          t2 =  vertices[[2,3,4,5]] 
+          a0 = tetra_area(t0)  
+          a1 = tetra_area(t1)
+          a2 = tetra_area(t2)
+          c0 = simplex_centroid(t0)
+          c1 = simplex_centroid(t1)
+          c2 = simplex_centroid(t2)
+          centroids[n] = (c0 * a0 + c1 * a1 + c2 * a2) / (a0 + a1 + a2)
+        if len(c) == 6: #Hexahedron
+          t0 =  vertices[[0,1,3,4]]
+          t1 =  vertices[[1,2,3,4]]
+          t2 =  vertices[[2,3,7,4]]
+          t3 =  vertices[[2,6,7,4]]
+          t4 =  vertices[[1,5,2,4]]
+          t5 =  vertices[[2,5,6,4]]
+           
+          a0 = tetra_area(t0)  
+          a1 = tetra_area(t1)
+          a2 = tetra_area(t2)
+          c0 = simplex_centroid(t0)
+          c1 = simplex_centroid(t1)
+          c2 = simplex_centroid(t2)
+          centroids[n] = (c0 * a0 + c1 * a1 + c2 * a2) / (a0 + a1 + a2)       
+    return centroids
     
     
 def RegularQuadMesh(N1=1, N2=1, l1=1.,l2=1.,name='QUAD4',dtf='f',dti='I'):
