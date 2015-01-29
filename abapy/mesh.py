@@ -1922,10 +1922,11 @@ class Mesh:
     from copy import copy
     import numpy as np
     '''
-    Looks for duplicated nodes and removes them.
+    Looks for duplicated nodes, removes them and updates connectivity.
     
     :param crit_istance: critical under which two nodes are considered as identical.
     :type crit_distance: float > 0.                                                            
+    
     '''
     
     nodes = self.nodes
@@ -2011,6 +2012,9 @@ class Mesh:
   def centroids(self):
     """
     Returns a dictionnary containing the coordinates of all the nodes belonging to earch element.
+    
+    .. plot:: example_code/mesh/Mesh-centroids.py
+     :include-source:
     """
     import numpy as np
     nodes = self.nodes

@@ -12,13 +12,9 @@ Add/remove/get data
 ___________________
 
 .. automethod:: abapy.mesh.Nodes.add_node
-
 .. automethod:: abapy.mesh.Nodes.drop_node
-
 .. automethod:: abapy.mesh.Nodes.add_set
-
 .. automethod:: abapy.mesh.Nodes.add_set_by_func
-
 .. automethod:: abapy.mesh.Nodes.drop_set
 
 Modifications
@@ -60,6 +56,7 @@ ___________________
 .. automethod:: abapy.mesh.Mesh.add_surface
 .. automethod:: abapy.mesh.Mesh.replace_node
 .. automethod:: abapy.mesh.Mesh.simplify_nodes
+.. automethod:: abapy.mesh.Mesh.centroids
 
 Modifications
 _____________
