@@ -3,7 +3,7 @@ Mesh
 ====
 '''
 
-class Nodes:
+class Nodes(object):
   '''
   Manages nodes for finite element modeling pre/postprocessing and further graphical representations.
   
@@ -766,7 +766,7 @@ class Nodes:
     return out
     
     
-class Mesh:
+class Mesh(object):
   '''
   Manages meshes for finite element modeling pre/postprocessing and further graphical representations.
   
