@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 from numpy import cos, sin, pi
 from copy import copy
 def function(x, y, z, labels):
-  r0 = 2.
+  r0 = 1.
   theta = 2 * pi * x
   r = y + r0
   ux = -x + r * cos(theta)
   uy = -y + r * sin(theta)
   uz = 0. * z
   return ux, uy, uz
-N1, N2 = 20, 4
+N1, N2 = 100, 25
 l1, l2 = .75, 1.
 Ncolor = 20
 mesh = RegularQuadMesh(N1 = N1, N2 = N2, l1 = l1, l2 = l2)
