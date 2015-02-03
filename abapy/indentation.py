@@ -1575,7 +1575,7 @@ class Manager:
     :param samplemesh: sample mesh.
     :type samplemesh: ``abapy.mesh.Mesh`` instance
     '''
-    from mesh import Mesh
+    from abapy.mesh import Mesh
     if isinstance(samplemesh, Mesh) == False: raise Exception, 'samplemesh must be Mesh instance, got {0} instead.'.format(type(samplemesh))
     self.samplemesh = samplemesh
   def set_indenter(self, indenter):
