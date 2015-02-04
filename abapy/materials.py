@@ -382,7 +382,7 @@ class SiDoLo(object):
           fich.write(motif.format(k))
       fich.write('\n')
       fich.write('*values \n')
-      motif = ' {0:s}\t{1:f}\n'
+      motif = ' {0:s} {1:f}\n'
       for k, v in coeffs.iteritems():
           fich.write(motif.format(k,v))
       fich.close()
