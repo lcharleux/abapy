@@ -2076,7 +2076,7 @@ class Mesh(object):
           c1 = simplex_centroid(t1)
           c2 = simplex_centroid(t2)
           centroids[n] = (c0 * a0 + c1 * a1 + c2 * a2) / (a0 + a1 + a2)
-        if len(c) == 6: #Hexahedron
+        if len(c) == 8: #Hexahedron
           t0 =  vertices[[0,1,3,4]]
           t1 =  vertices[[1,2,3,4]]
           t2 =  vertices[[2,3,7,4]]
