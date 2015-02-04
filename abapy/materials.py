@@ -372,7 +372,7 @@ class SiDoLo(object):
 
       # Ecriture dans un fichier formatte
       
-      if dirsid[-1]!='/': dirsid = dirsid + '/'
+      if self.dirsid[-1]!='/': self.dirsid = self.dirsid + '/'
       filename = self.dirsid +  self.labels[i] + '.coe'
       
       fich = open(filename, 'w')
