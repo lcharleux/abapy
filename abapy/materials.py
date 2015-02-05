@@ -332,11 +332,12 @@ class SiDoLo(object):
      All inputs must have the same length or an exception will be raised.
     
   '''
-  def __init__(self, labels='mat', dictionary={}, dirsid = '/tmp'):
+  def __init__(self, labels='mat', dictionary={}, umat={}, dirsid = '/tmp'):
     from array import array
     if type(labels) is str: labels=[labels]
     self.labels=labels
     self.dictionary=[dictionary]
+    self.umat=[umat]
     self.dirsid=dirsid
 
   def __repr__(self):
