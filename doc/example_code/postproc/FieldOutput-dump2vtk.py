@@ -17,4 +17,6 @@ out = ''
 out+=mesh.dump2vtk()
 out+=nodeField.dump2vtk('nodeField')
 out+=elementField.dump2vtk('elementField')
-print out
+f = open("FieldOutput-dump2vtk.vtk", "w")
+f.write(out)
+f.close()

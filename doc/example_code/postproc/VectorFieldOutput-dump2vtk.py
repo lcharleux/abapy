@@ -8,6 +8,6 @@ fo1, fo2 = FieldOutput(labels = labels, data=data1, position='node' ), FieldOutp
 vector = VectorFieldOutput(data1 = fo1, data2 = fo2 )
 out = mesh.dump2vtk() + vector.dump2vtk()
 f = open('vector.vtk','w')
-f.write(out)
+f.write("out")
 f.close()
 

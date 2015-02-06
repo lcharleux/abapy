@@ -56,7 +56,12 @@ ___________________
 .. automethod:: abapy.mesh.Mesh.add_surface
 .. automethod:: abapy.mesh.Mesh.replace_node
 .. automethod:: abapy.mesh.Mesh.simplify_nodes
+
+Useful data
+___________________
+
 .. automethod:: abapy.mesh.Mesh.centroids
+.. automethod:: abapy.mesh.Mesh.volume
 
 Modifications
 _____________
@@ -79,8 +84,7 @@ _____________
 .. automethod:: abapy.mesh.Mesh.dump2triplot
 .. automethod:: abapy.mesh.Mesh.get_edges
 .. automethod:: abapy.mesh.Mesh.get_border
-
-
+.. automethod:: abapy.mesh.Mesh.dump2polygons
 
 Mesh generation
 ~~~~~~~~~~~~~~~

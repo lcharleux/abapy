@@ -733,6 +733,7 @@ class Nodes(object):
     zmin, zmax = min(self.z), max(self.z)
     dx, dy, dz = xmax - xmin, ymax - ymin,  zmax - zmin
     return ( (xmin - margin * dx, xmax + margin * dx ), (ymin - margin * dy, ymax + margin * dy ), (zmin - margin * dz, zmax + margin * dz ) )
+  
   def apply_reflection(self,point = (0., 0., 0.), normal = (1., 0., 0.)):
     '''
     Applies a reflection symmetry to the nodes instance. The reflection plane is defined by a point and a normal direction.
@@ -2087,13 +2088,113 @@ class Mesh(object):
           a0 = tetra_area(t0)  
           a1 = tetra_area(t1)
           a2 = tetra_area(t2)
+          a3 = tetra_area(t3)  
+          a4 = tetra_area(t4)
+          a5 = tetra_area(t5)
           c0 = simplex_centroid(t0)
           c1 = simplex_centroid(t1)
           c2 = simplex_centroid(t2)
-          centroids[n] = (c0 * a0 + c1 * a1 + c2 * a2) / (a0 + a1 + a2)       
+          c3 = simplex_centroid(t3)
+          c4 = simplex_centroid(t4)
+          c5 = simplex_centroid(t5)
+          centroids[n] = (c0 * a0 + c1 * a1 + c2 * a2 + c3 * a3 + c4 * a4 + c5 * a5) / (a0 + a1 + a2 + a3 + a4 + a5)       
     return centroids
     
+  def volume(self):
+    """
+    Returns a dictionnary containing the volume of all the elements.
     
+    .. plot:: example_code/mesh/Mesh-volume.py
+     :include-source:
+    """
+    import numpy as np
+    nodes = self.nodes
+    conn = self.connectivity
+    space = self.space
+    
+    def tri_area(vertices):
+      u = vertices[0]
+      v = vertices[1]
+      w = vertices[2]
+      return np.linalg.norm(np.cross( v-u, w-u)) / 2.
+    
+    def tetra_area(vertices):
+      u = vertices[0]
+      v = vertices[1]
+      w = vertices[2]
+      x = vertices[3]
+      return abs(np.cross(v-u, w-u).dot(x-u)) / 6. 
+     
+
+
+    volume = np.zeros([len(conn)])
+    for n in xrange(len(conn)):
+      c = conn[n]
+      s = space[n]
+      vertices = np.zeros([len(c), 3])
+      for i in xrange(len(c)):
+        loc = nodes.labels.index(c[i])
+        vertices[i,0] = nodes.x[loc]
+        vertices[i,1] = nodes.y[loc]
+        vertices[i,2] = nodes.z[loc]
+        
+      if s == 2: # 2D
+        if len(c) == 3:  # Triangle
+          volume[n] = tri_area(vertices)
+        if len(c) == 4:  # Quadrangle
+          t0 =  vertices[[0,1,2]]
+          t1 =  vertices[[2,3,0]] 
+          a0 = tri_area(t0)  
+          a1 = tri_area(t1)
+          volume[n] = a0 + a1   
+      if s == 3: # 3D
+        if len(c) == 4: # Tretrahedron
+          volume[n] = tetra_area(vertices)
+        if len(c) == 6: #Prism
+          t0 =  vertices[[0,1,2,3]]
+          t1 =  vertices[[1,2,3,4]]
+          t2 =  vertices[[2,3,4,5]] 
+          a0 = tetra_area(t0)  
+          a1 = tetra_area(t1)
+          a2 = tetra_area(t2)
+          volume[n] = a0 + a1 + a2
+        if len(c) == 8: #Hexahedron
+          t0 =  vertices[[0,1,3,4]]
+          t1 =  vertices[[1,2,3,4]]
+          t2 =  vertices[[2,3,7,4]]
+          t3 =  vertices[[2,6,7,4]]
+          t4 =  vertices[[1,5,2,4]]
+          t5 =  vertices[[2,5,6,4]]
+          a0 = tetra_area(t0)  
+          a1 = tetra_area(t1)
+          a2 = tetra_area(t2)
+          a3 = tetra_area(t3)  
+          a4 = tetra_area(t4)
+          a5 = tetra_area(t5)
+          volume[n] = a0 + a1 + a2 + a3 + a4 + a5   
+    return volume  
+    
+  def dump2polygons(self):
+    """
+    Returns 2D elements as matplotlib poly collection.
+    
+    .. plot:: example_code/mesh/Mesh-dump2polygons.py
+     :include-source:
+    
+    """  
+    from matplotlib import cm
+    import numpy as np
+    import matplotlib.collections as collections
+    n = self.nodes
+    nodes = np.array([n.x, n.y]).transpose()
+    conn = np.array(self.connectivity)
+    labels = n.labels
+    verts = [[nodes[ labels.index(i) ] for i in c ] for c in conn]
+    patches = collections.PolyCollection(verts, 
+      edgecolor = "black", linewidth = .1, facecolor = "none")
+    return patches
+
+
 def RegularQuadMesh(N1=1, N2=1, l1=1.,l2=1.,name='QUAD4',dtf='f',dti='I'):
   '''Generates a 2D regular quadrangle mesh.
   
