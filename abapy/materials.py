@@ -320,3 +320,71 @@ class Bilinear(object):
       Eps_p_sat.append((self.Ssat[i] - self.sy[i])/self.n[i])
       out += pattern.format(self.labels[i],self.E[i],self.nu[i],self.sy[i], self.Ssat[i], Eps_p_sat[i])
     return out[0:-1]    
+
+class SiDoLo(object):
+  ''' 
+  Represents constitutive equations via UMAT subroutines and SiDoLo used for FEM simulations
+  
+  :param: 
+  :type : 
+  
+  .. note:: 
+     All inputs must have the same length or an exception will be raised.
+    
+  '''
+  def __init__(self, labels='mat', dictionary={}, umat={}, dirsid = '/tmp'):
+    from array import array
+    if type(labels) is str: labels=[labels]
+    self.labels=labels
+    self.dictionary=[dictionary]
+    self.umat=[umat]
+    self.dirsid=dirsid
+
+  def __repr__(self):
+    return '<UMAT/SiDoLo instance: {0} samples>'.format(len(self.labels))
+
+  def dump2inp(self):
+    '''
+    Returns materials in a format suitable with Abaqus input files.
+    
+    :rtype: string
+    '''  
+    self.dump2coe()
+    out = '** {0}\n'.format(self.__repr__()) # Initialisation
+    pattern = '*MATERIAL, NAME={0}\n*USER MATERIAL, CONSTANTS=2\n  {1}, {2}\n*DEPVAR\n  {3}\n'
+    for i in xrange(len(self.labels)):
+      params  = self.dictionary[i]['Parameters']
+      varint  = self.dictionary[i]['Variables']
+      Lvarint = len(varint)
+      out += pattern.format(self.labels[i],params['epsrk'],params['toly'],Lvarint)
+    return out[0:-1] # La sortie est tout sauf le dernier element de out (ligne blanche)
+
+  def dump2coe(self):
+    '''
+    Returns materials coefficients in a format suitable with Abaqus/SiDoLo.
+    
+    :rtype: string
+    '''
+    from collections import OrderedDict
+    for i in xrange(len(self.labels)):
+      # Definition des sous-dictionnaires
+      coeffs  = self.dictionary[i]['Coefficients']
+      varint  = self.dictionary[i]['Variables']
+
+      # Ecriture dans un fichier formatte
+      
+      if self.dirsid[-1]!='/': self.dirsid = self.dirsid + '/'
+      filename = self.dirsid +  self.labels[i] + '.coe'
+      
+      fich = open(filename, 'w')
+      fich.write('*list \n')
+      motif = ' {:s}'
+      for k, v in coeffs.iteritems():
+          fich.write(motif.format(k))
+      fich.write('\n')
+      fich.write('*values \n')
+      motif = ' {0:s} {1:f}\n'
+      for k, v in coeffs.iteritems():
+          fich.write(motif.format(k,v))
+      fich.close()
+    return

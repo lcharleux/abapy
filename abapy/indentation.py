@@ -1519,7 +1519,7 @@ class Manager:
   .. note:: In order to used abaqus Python, you have to build a post processing script that is executed in ``abaqus python``. Here is an example :download:`abqpostproc.py <example_code/indentation/workdir/abqpostproc.py>`:
   
   .. literalinclude:: example_code/indentation/workdir/abqpostproc.py
-
+'sta', 'sim', 'prt', 'odb', 'msg', 'log', 'dat', 'com', 'inp','lck','pckl'
   .. note:: This class is still unfinished, post processing part remains unwritten (LC, April 12 2012) 
   '''
   def __init__(self, workdir = '', abqlauncher = 'abaqus', samplemesh = None, indenter = None, samplemat = None, indentermat = None, friction = 0. ,steps = None, is_3D = False, simname = 'indentation', files2delete = ['sta', 'sim', 'prt', 'odb', 'msg', 'log', 'dat', 'com', 'inp','lck','pckl'], abqpostproc = 'abqpostproc.py'):
@@ -1671,8 +1671,21 @@ class Manager:
     
     import os, time, subprocess
     t0 = time.time()
-    print '< Running simulation {0} in Abaqus>'.format(self.simname) 
-    p = subprocess.Popen( '{0} job={1} input={1}.inp interactive'.format(self.abqlauncher, self.simname), cwd = self.workdir, shell=True, stdout = subprocess.PIPE)
+    print '< Running simulation {0} in Abaqus>'.format(self.simname)  
+    command = '{0} job={1} input={1}.inp interactive'.format(self.abqlauncher, self.simname) 
+    print command
+    p = subprocess.Popen(command, cwd = self.workdir, shell=True, stdout = subprocess.PIPE)
+         
+    # Case for using UMAT subroutines
+    from abapy.materials import SiDoLo
+    print '============='
+    print isinstance(self.samplemat,SiDoLo)
+    print '============='
+    if isinstance(self.samplemat,SiDoLo): 
+      self.abqlauncher = '/vol/app/Abaqus-dev64/6.10-1/exec/abq6101.exe'
+      command = '{0} job={1} input={1}.inp user={2} interactive'.format(self.abqlauncher, self.simname, self.samplemat.umat[0])
+      print command
+      p = subprocess.Popen(command, cwd = self.workdir, shell=True, stdout = subprocess.PIPE)
     trash = p.communicate()
     t1 = time.time()
     self.duration = t1 - t0
