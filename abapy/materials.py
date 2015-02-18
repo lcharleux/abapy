@@ -388,3 +388,96 @@ class SiDoLo(object):
           fich.write(motif.format(k,v))
       fich.close()
     return
+
+class Ludwig(object):
+  ''' 
+  Represents Hollomon power law hardening used for FEM simulations.
+  
+  :param E: Young's modulus.
+  :type E: float, list, array.array
+  :param nu: Poisson's ratio.
+  :type nu: float, list, array.array
+  :param sy: Yield stress.
+  :type sy: float, list, array.array
+  :param n: hardening exponent
+  :type n: float, list, array.array
+  :param K: strenght index
+  :type K: float, list, array.array
+  
+  .. note:: 
+     All inputs must have the same length or an exception will be raised.
+    
+  .. plot:: example_code/materials/Hollomon.py
+    :include-source:   
+  
+  
+  '''
+  def __init__(self, labels='mat', E = 1., nu = 0.3, sy = 150, K = 20., n = 0.2, dtf='d'):
+    from array import array
+    import numpy as np
+    if type(labels) is str: labels=[labels]
+    self.labels=labels
+    l = len(labels)
+    E = float_arg(E)
+    if len(E) != l: raise Exception, 'Parameters must all have the same length'
+    self.E=array(dtf,E)
+    nu = float_arg(nu)
+    if len(nu) != l: raise Exception, 'Parameters must all have the same length'
+    self.nu=array(dtf,nu)  
+    K = float_arg(K)
+    if len(K) != l: raise Exception, 'Parameters must all have the same length'
+    self.K=array(dtf,K)
+    n = float_arg(n)
+    if len(n) != l: raise Exception, 'Parameters must all have the same length'
+    self.n=array(dtf,n)
+    sy = float_arg(sy)
+    if len(sy) != l: raise Exception, 'Parameters must all have the same length'
+    self.sy=array(dtf,sy)
+  def __repr__(self):
+    return '<Hollomon instance: {0} samples>'.format(len(self.E))
+  
+  def get_table(self, position, eps_max = 10., N = 100):
+    '''
+    Returns the tabular data corresponding to the tensile stress strain law using log spacing.
+    
+    :param eps_max: maximum strain to be computed.
+    :type eps_max: float
+    :param N: number of points to be computed.
+    :type N: int
+    :rtype: ``numpy.array``
+    '''
+    import numpy as np
+    K = self.K[position]
+    n = self.n[position]
+    sy = self.sy[position]
+    E = self.E[position]
+    s = 10.**np.linspace(0., np.log10(eps_max/0.001), N, endpoint = True)
+    eps_p_temp, sigma = [0],[sy]
+    for i in range(0, len(s)):
+      eps_p_temp.append((0.001) * s[i])
+      sigma.append(sy + K * ((0.001) * s[i])**n)
+      eps_p = np.asarray(eps_p_temp)
+    return np.array([eps_p, sigma]).transpose()
+      
+  def dump2inp(self, eps_max = 10., N = 100):
+    '''
+    Returns materials in INP format suitable with abaqus input files.
+    
+    :param eps_max: maximum strain to be computed.
+    :type eps_max: float
+    :param N: number of points to be computed.
+    :type N: int
+    :rtype: string
+    '''
+    out = '** {0}\n'.format(self.__repr__())
+    pattern = '*MATERIAL, NAME={0}\n*ELASTIC\n  {1}, {2}\n*PLASTIC\n{3}\n'
+    for i in xrange(len(self.E)):
+      table = self.get_table(position = i, eps_max = eps_max, N = N)
+      sigma = table[:,1]
+      eps_p = table[:,0]
+      #eps = [eps_p[j] + sigma[j] / self.E[i] for j in xrange(len(eps_p))]
+      data = ''
+      for j in xrange(len(table)):
+        data += '  {0}, {1}\n'.format(sigma[j], eps_p[j])
+      out += pattern.format(self.labels[i],self.E[i],self.nu[i],data[0:-1])
+    return out[0:-1]
