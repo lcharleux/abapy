@@ -436,7 +436,7 @@ class Ludwig(object):
   def __repr__(self):
     return '<Hollomon instance: {0} samples>'.format(len(self.E))
   
-  def get_table(self, position, eps_max = 10., N = 100):
+  def get_table(self, position, eps_max = 1., N = 100):
     '''
     Returns the tabular data corresponding to the tensile stress strain law using log spacing.
     
@@ -451,15 +451,17 @@ class Ludwig(object):
     n = self.n[position]
     sy = self.sy[position]
     E = self.E[position]
-    s = 10.**np.linspace(0., np.log10(eps_max/0.001), N, endpoint = True)
+    ey = sy/E
+    s = 10.**np.linspace(0., np.log10(eps_max/ey), N, endpoint = True)
     eps_p_temp, sigma = [0],[sy]
+    
     for i in range(0, len(s)):
-      eps_p_temp.append((0.001) * s[i])
-      sigma.append(sy + K * ((0.001) * s[i])**n)
+      eps_p_temp.append(ey * s[i])
+      sigma.append(sy + K * (ey * s[i])**n)
       eps_p = np.asarray(eps_p_temp)
     return np.array([eps_p, sigma]).transpose()
       
-  def dump2inp(self, eps_max = 10., N = 100):
+  def dump2inp(self, eps_max = 1., N = 100):
     '''
     Returns materials in INP format suitable with abaqus input files.
     
