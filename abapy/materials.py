@@ -317,8 +317,10 @@ class Bilinear(object):
     pattern = '*MATERIAL, NAME={0}\n*ELASTIC\n  {1}, {2}\n*PLASTIC\n  {3}, 0.\n {4}, {5}'
     Eps_p_sat=[]
     for i in xrange(len(self.E)):
-      Eps_p_sat.append((self.Ssat[i] - self.sy[i])/self.n[i])
-      out += pattern.format(self.labels[i],self.E[i],self.nu[i],self.sy[i], self.Ssat[i], Eps_p_sat[i])
+        Eps_p_sat.append(abs(self.Ssat[i] - self.sy[i])/self.n[i])
+        if self.sy[i] > self.Ssat[i]:
+            self.sy[i]=self.Ssat[i]   
+        out += pattern.format(self.labels[i],self.E[i],self.nu[i],self.sy[i], self.Ssat[i], Eps_p_sat[i])
     return out[0:-1]    
 
 class SiDoLo(object):
