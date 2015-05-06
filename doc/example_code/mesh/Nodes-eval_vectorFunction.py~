@@ -36,6 +36,7 @@ ax3.set_frame_on(False)
 ax.set_title(r'$V_1$')
 ax2.set_title(r'$V_2$')
 ax3.set_title(r'$\sqrt{\vec{V}^2}$')
+ax3.set_title(r'$||\vec{V}||$')
 x,y,z = mesh.get_edges() # Mesh edges
 xt,yt,zt = mesh.convert2tri3().get_edges() # Triangular mesh edges
 xb,yb,zb = mesh.get_border()

@@ -1144,7 +1144,7 @@ class DeformableCone3D:
     '''
     self.mesh.nodes.apply_displacement(disp)
   
-class Step:
+class Step(object):
   '''
   Builds a typical indentation step.
   
@@ -1160,7 +1160,7 @@ class Step:
   :type fieldOutputFreq: int
   :param boundaries_3D: 3D or 2D boundary conditions. If 3D is True, then boundary conditions will be applied to the node sets ``front`` and ``back``.
   :type boundaries_3D: boolean 
-  : param full_3D: set to True if the model is a complete 3D model without symmetries and then does not need side boundaries.
+  :param full_3D: set to True if the model is a complete 3D model without symmetries and then does not need side boundaries.
   :type full_3D: boolean
   :param rigid_indenter_3D: Set to True if a 3D indenter is rigid  
   :type rigid_indenter_3D: boolean
@@ -1168,7 +1168,9 @@ class Step:
   :type nodeFieldOutput: string or list of strings
   :param elemFieldOutput: node outputs.
   :type elemFieldOutput: string or list of strings
+  
   '''
+  
   def __init__(self, name, disp = 1., nlgeom = True, nframes = 100, fieldOutputFreq = 999999, boundaries_3D = False, full_3D = False, rigid_indenter_3D = True,  nodeFieldOutput = ['COORD', 'U'], elemFieldOutput = ['LE', 'EE', 'PE', 'PEEQ', 'S'], mode = 'bulk'):
     self.set_name(name)
     self.set_displacement(disp)
@@ -1359,7 +1361,6 @@ COOR1, COOR2, COOR3
     
     
 def MakeInp(sample_mesh = None, indenter = None, sample_mat = None, indenter_mat = None, friction = 0.0, steps = None, is_3D = False, heading = 'Abapy Indentation Simulation'):
-  import copy
   '''
   Builds a complete indentation INP for Abaqus and returns it as a string.
   
@@ -1387,7 +1388,8 @@ def MakeInp(sample_mesh = None, indenter = None, sample_mat = None, indenter_mat
   :download:`indentation_axi.inp <example_code/indentation/workdir/indentation_axi.inp>`
   
   :download:`indentation_berko.inp <example_code/indentation/workdir/indentation_berko.inp>`
-'''
+  '''
+  import copy
 
   introPattern = '''**----------------------------------
 **INDENTATION SIMULATION
@@ -1483,11 +1485,10 @@ I_SAMPLE.SURFACE_FACES, I_INDENTER.SURFACE_FACES
 
 class Manager:
   '''
-  The spirit of the simulation manager is to allow you to work at a higher level.   Using it allows you to define once and for all where you work, where Abaqus is, it fill manage subprocesses (Abaqus, Abaqus python) automatically. It is particularly interresting to perform parametric simulation because you can modify one parameter (material property, inenter property, ...) and keep all other parameters fixed and rerun directly the simulation process without making any mistake.
+  The spirit of the simulation manager is to allow you to work at a higher level. Using it allows you to define once and for all where you work, where Abaqus is, it fill manage subprocesses (Abaqus, Abaqus python) automatically. It is particularly interresting to perform parametric simulation because you can modify one parameter (material property, inenter property, ...) and keep all other parameters fixed and rerun directly the simulation process without making any mistake.
   
   .. note:: This class is still under developpement, important changes may then happen.
-
-  
+    
   :param workdir: work directory where simulation is to be run.
   :type workdir: string
   :param abqlauncher: abaqus launcher or path to it. Take care about aliases under linux because they often don't work under non interactive shells. A direct path to the launcher may be a good idea.
@@ -1519,8 +1520,7 @@ class Manager:
   .. note:: In order to used abaqus Python, you have to build a post processing script that is executed in ``abaqus python``. Here is an example :download:`abqpostproc.py <example_code/indentation/workdir/abqpostproc.py>`:
   
   .. literalinclude:: example_code/indentation/workdir/abqpostproc.py
-'sta', 'sim', 'prt', 'odb', 'msg', 'log', 'dat', 'com', 'inp','lck','pckl'
-  .. note:: This class is still unfinished, post processing part remains unwritten (LC, April 12 2012) 
+  
   '''
   def __init__(self, workdir = '', abqlauncher = 'abaqus', samplemesh = None, indenter = None, samplemat = None, indentermat = None, friction = 0. ,steps = None, is_3D = False, simname = 'indentation', files2delete = ['sta', 'sim', 'prt', 'odb', 'msg', 'log', 'dat', 'com', 'inp','lck','pckl'], abqpostproc = 'abqpostproc.py'):
     from materials import Elastic, VonMises

@@ -3,6 +3,8 @@ Mesh
 ====
 '''
 
+import copy
+
 class Nodes(object):
   '''
   Manages nodes for finite element modeling pre/postprocessing and further graphical representations.
@@ -1965,28 +1967,35 @@ class Mesh(object):
     else:
       new_dtf = 'f'
     nodes = self.nodes
-    max_nlabel = max(nodes.labels)
-    max_elabel = max(self.labels)
+    if len(nodes.labels) != 0:
+      max_nlabel = max(nodes.labels)
+    else:
+      max_nlabel = 0
+    if len(self.labels)!= 0:  
+      max_elabel = max(self.labels)
+    else:
+      max_elabel = 0
     onodes = other_mesh.nodes
-    for i in xrange(len(onodes.labels)):
-      l = onodes.labels[i]
-      node = onodes[l]
-      toset = node.sets.keys()
-      x, y, z = node.x[0], node.y[0], node.z[0]
-      nodes.add_node(label = l + max_nlabel, x = x, y = y, z = z, toset = toset  )
-    for i in xrange(len(other_mesh.labels)):
-      l = other_mesh.labels[i]
-      element = other_mesh[l]
-      toset = element.sets.keys()
-      conn = [n + max_nlabel for n in element.connectivity[0] ]
-      space = element.space[0]
-      name = element.name[0]
-      self.add_element(label = l + max_elabel, connectivity = conn, space = space, name = name, toset = toset  )
-    if simplify:
-      if crit_distance == None:
-        self.simplify_nodes()    
-      else:
-        self.simplify_nodes(crit_distance = crit_distance)
+    if len(onodes.labels)!= 0:
+      for i in xrange(len(onodes.labels)):
+        l = onodes.labels[i]
+        node = onodes[l]
+        toset = node.sets.keys()
+        x, y, z = node.x[0], node.y[0], node.z[0]
+        nodes.add_node(label = l + max_nlabel, x = x, y = y, z = z, toset = toset  )
+      for i in xrange(len(other_mesh.labels)):
+        l = other_mesh.labels[i]
+        element = other_mesh[l]
+        toset = element.sets.keys()
+        conn = [n + max_nlabel for n in element.connectivity[0] ]
+        space = element.space[0]
+        name = element.name[0]
+        self.add_element(label = l + max_elabel, connectivity = conn, space = space, name = name, toset = toset  )
+      if simplify:
+        if crit_distance == None:
+          self.simplify_nodes()    
+        else:
+          self.simplify_nodes(crit_distance = crit_distance)
   
   def apply_reflection(self,point = (0., 0., 0.), normal = (1., 0., 0.)):
     '''
@@ -2239,6 +2248,118 @@ def RegularQuadMesh(N1=1, N2=1, l1=1.,l2=1.,name='QUAD4',dtf='f',dti='I'):
   nodes.add_set('left', range(1,(N1+1)*N2+2,N1+1))
   nodes.add_set('right', range(N1+1,(N1+1)*(N2+1)+1,N1+1))
   return mesh
+
+def UnitTransition(name='CAX4', l1 = 1., l2 =1.):
+  m = Mesh()
+  n = m.nodes
+  n.add_node(label = 1, x = 0., y=0.)
+  n.add_node(label = 2, x = 0.5, y=0.)
+  n.add_node(label = 3, x = 1., y=0.)
+  n.add_node(label = 4, x = 0., y=0.5)
+  n.add_node(label = 5, x = 0.25, y=0.5)
+  n.add_node(label = 6, x = 0.75, y=0.5)
+  n.add_node(label = 7, x = 1., y=0.5)  
+  n.add_node(label = 8, x = 0., y=1.)
+  n.add_node(label = 9, x = 0.25, y=1.)
+  n.add_node(label = 10, x = 0.5, y=1.)
+  n.add_node(label = 11, x = 0.75, y=1.) 
+  n.add_node(label = 12, x = 1., y=1.)
+  m.add_element(connectivity = [1,2,5,4], label = 1, name = name, space = 2)
+  m.add_element(connectivity = [2,10,9,5], label = 2, name = name, space = 2)
+  m.add_element(connectivity = [2,6,11,10], label = 3, name = name, space = 2)
+  m.add_element(connectivity = [2,3,7,6], label = 4, name = name, space = 2)
+  m.add_element(connectivity = [4,5,9,8], label = 5, name = name, space = 2)  
+  m.add_element(connectivity = [6,7,12,11], label = 6, name = name, space = 2) 
+  def function(x, y, z, labels):
+    ux = x * (l1 - 1.)
+    uy = y * (l2 - 1.)
+    uz = 0. * z 
+    return ux, uy, uz
+  u = m.nodes.eval_vectorFunction(function)
+  m.nodes.apply_displacement(u)
+  return m
+
+def TransitionMesh(N1 = 4, N2 = 2, l1 = 1., l2 = 1., direction = "y+", name = 'CAX4', crit_distance = 1.e-6 ):
+  """
+  A mesh transition to manage them all...
+  
+  :param N1: starting number of elements, must be multiple of 4.
+  :type N1: int
+  :param N2: ending number of elements, must be lower than N1 and multiple of 2.
+  :type N2: int
+  :param l1: length of the mesh in the x direction.
+  :type l1: float
+  :param l2: length of the mesh in the y direction.
+  :type l2: float
+  :param direction: direction of mesh. Must be in ("x+", "x-", "y+", "y-").
+  :type direction: str
+  :param name: name of the element in the export procedures.
+  :type name: str
+  :param crit_distance: critical distance in union process.
+  :type crit_distance: float
+  
+  .. plot:: example_code/mesh/TransitionMesh.py
+     :include-source:
+  """
+  tx, ty = 0., 0.
+  N1u, N2u = 0, N1
+  k = 1.
+  lx, ly = 2., 1. 
+  m = Mesh()
+  while N2u > N2:
+    while N1u < N1:
+      m1 = UnitTransition(l1 = k*lx, l2 = k*ly, name = name)
+      m1.nodes.translate(x = tx*k*lx, y = ty)
+      m.union(m1, crit_distance = crit_distance)
+      N1u += 4
+      tx  += 1.
+    k *= 2.  
+    N1 /= 2
+    N1u = 0  
+    tx = 0.
+    ty -= k*ly
+    N2u /= 2
+  def function(x, y, z, labels):
+    xmin, xmax = x.min(), x.max()
+    ymin, ymax = y.min(), y.max() 
+    ux = -x + (x-xmin)/(xmax-xmin)
+    uy = -y + (y-ymin)/(ymax-ymin)
+    uz = 0. * z 
+    return ux, uy, uz
+  u = m.nodes.eval_vectorFunction(function)
+  m.nodes.apply_displacement(u)  
+  if direction != "y+":
+    if direction == "y-":
+      def function2(x, y, z, labels):
+        ux = 1. - 2 * x
+        uy = 1. - 2 * y
+        uz = 0. * z
+        return ux, uy, uz
+    if direction == "x+":
+      def function2(x, y, z, labels):
+        ux = -x + y
+        uy = -y - x + 1.
+        uz = 0. * z
+        return ux, uy, uz
+    if direction == "x-":
+      def function2(x, y, z, labels):
+        ux = -x - y
+        uy = -y + x -1.
+        uz = 0. * z
+        return ux, uy, uz    
+    u2 = m.nodes.eval_vectorFunction(function2)
+    u2 = m.nodes.eval_vectorFunction(function2)
+    m.nodes.apply_displacement(u2)      
+  def function(x, y, z, labels):
+    xmin, xmax = x.min(), x.max()
+    ymin, ymax = y.min(), y.max() 
+    ux = -x + (x-xmin)/(xmax-xmin)*l1 
+    uy = -y + (y-ymin)/(ymax-ymin)*l2
+    uz = 0. * z 
+    return ux, uy, uz
+  u = m.nodes.eval_vectorFunction(function)
+  m.nodes.apply_displacement(u)  
+  return m  
  
 def RegularQuadMesh_like(x_list = [0., 1.], y_list = [0., 1.],name='QUAD4',dtf='f',dti='I'):
   '''Generates a 2D regular quadrangle mesh from 2 lists of positions. This version of RegularQuadMesh is an alternative to the normal one in some cases where fine tuning of x, y positions is required.

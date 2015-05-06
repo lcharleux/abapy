@@ -92,9 +92,12 @@ Mesh generation
 ``RegularQuadMesh`` functions
 _____________________________
 .. autofunction:: abapy.mesh.RegularQuadMesh
-
 .. autofunction:: abapy.mesh.RegularQuadMesh_like
 
-..note:: see also in ``abapy.indentation`` for indentation dedicated meshes.
+Other meshes
+__________________
+.. autofunction:: abapy.mesh.TransitionMesh
+
+.. note:: see also in ``abapy.indentation`` for indentation dedicated meshes.
   
 
