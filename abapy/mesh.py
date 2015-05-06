@@ -425,7 +425,7 @@ class Nodes(object):
     labels = self.labels
     x, y, z = self.x, self.y, self.z
     sets = self.sets
-    out ='**----------------------------------\n** NODES\n**----------------------------------\n*Node, NSET=ALLNODES\n'
+    out ='**----------------------------------\n** NODES\n**----------------------------------\n*NODE, NSET=ALLNODES\n'
     pattern = '  {0}, {1}, {2}, {3}\n'
     for i in xrange(len(labels)):
       out += pattern.format(labels[i],x[i],y[i],z[i])
