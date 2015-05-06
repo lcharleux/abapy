@@ -14,15 +14,28 @@ Abaqus Python "**AbaPy**" contains tools to build, postprocess and plot automati
 
 
 .. codeauthor:: Ludovic Charleux <ludovic.charleux@univ-savoie.fr>
-
      
 
-Installation can be performed easily by:
-  * Dirty method: copy the whole spym directory in the directory as your script using it, it will work. In fact Python first looks for modules in the current directory. This method 
-  * Better method:
+Installation can be performed in many ways, here a two:
+  
+* The right way:
+  
+.. code-block:: bash
+
+   pip install git+https://github.com/lcharleux/abapy.git
+
+* If you are contributing to the module, you can just clone the repository:
     
-    + copying the module where you want to.
-    + add the module directory to python module search path by creating a ``.profile`` file in your home directory and containing ``export PYTHONPATH=path``. Where ``path`` is the absolute address of the directory containing the abapy directory.
+.. code-block:: bash
+
+   git clone https://github.com/lcharleux/abapy.git   
+
+And remember to add the abapy/abapy directory to your ``PYTHONPATH``. For example, the following code can be used under Linux (in ``.bashrc`` or ``.profile``):
+
+.. code-block:: bash
+
+  export PYTHONPATH=$PYTHONPATH:yourpath/abapy 
+
 
 .. toctree::
    :maxdepth: 2
