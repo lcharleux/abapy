@@ -54,6 +54,7 @@ ___________________
 .. automethod:: abapy.mesh.Mesh.add_set
 .. automethod:: abapy.mesh.Mesh.drop_set
 .. automethod:: abapy.mesh.Mesh.add_surface
+.. automethod:: abapy.mesh.Mesh.node_set_to_surface
 .. automethod:: abapy.mesh.Mesh.replace_node
 .. automethod:: abapy.mesh.Mesh.simplify_nodes
 
