@@ -1591,7 +1591,7 @@ class Mesh(object):
     :param mapping: gives the way to translate element names during extrusion. Example: {'CAX4':'C3D8','CAX3':'C3D6'}. If 2D element name is not in the mapping, names will be chosen in the basic continuum elements used by Abaqus: 'C3D6' and 'C3D8'.   
     :type mapping: dictionary
     :param extrude: if True, this param will modify the transformation used to produce the sweep. The result will be a mixed form of sweep and extrusion useful to produce pyramids. When using this option, the sweep angle must be lower than 90 degrees.
-    
+    :type extrude: boolean 
     
     .. plot:: example_code/mesh/Mesh-sweep.py
       :include-source:    
@@ -2202,8 +2202,46 @@ class Mesh(object):
     patches = collections.PolyCollection(verts, 
       edgecolor = "black", linewidth = .1, facecolor = "none")
     return patches
-
-
+  
+  def node_set_to_surface(self, surface, nodeSet):
+    """
+    Builds a surface from a node set.
+    
+    :param surface: surface label
+    :type surface: string
+    :param nodeSet: nodeSet label
+    :type nodeSet: string
+    
+    .. plot:: example_code/mesh/Mesh-node_set_to_surface.py
+     :include-source:
+    """
+    nodes = self.nodes
+    nset = set(nodes.sets[nodeSet])
+    f1, f2, f3, f4 = [], [], [], [] 
+    for i in xrange(len(self.labels)):
+      c = list(self.connectivity[i])
+      inter = nset & set(c)
+      ind = set([c.index(j) for j in inter])
+      if self.space[i] == 2:
+        if len(inter) >= 2:
+          if set([0,1]) <= ind: f1.append(self.labels[i])
+          if set([1,2]) <= ind: f2.append(self.labels[i])
+          if set([2,3]) <= ind: f3.append(self.labels[i])
+          if set([3,0]) <= ind: f4.append(self.labels[i])
+    if len(f1) != 0: 
+      self.add_set(surface+"_f1", f1)
+      self.add_surface(surface, [(surface+"_f1", 1)])
+    if len(f2) != 0: 
+      self.add_set(surface+"_f2", f2)
+      self.add_surface(surface, [(surface+"_f2", 2)])
+    if len(f3) != 0: 
+      self.add_set(surface+"_f3", f3)
+      self.add_surface(surface, [(surface+"_f3", 3)])
+    if len(f4) != 0: 
+      self.add_set(surface+"_f4", f4)
+      self.add_surface(surface, [(surface+"_f4", 4)])        
+       
+  
 def RegularQuadMesh(N1=1, N2=1, l1=1.,l2=1.,name='QUAD4',dtf='f',dti='I'):
   '''Generates a 2D regular quadrangle mesh.
   
