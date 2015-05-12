@@ -1794,11 +1794,21 @@ class Mesh(object):
     return omesh
       
     
-  def dump2vtk(self):
+  def dump2vtk(self, path = None):
     '''
     Dumps the mesh to the VTK format. VTK format can be visualized using Mayavi2 or Paraview. This method is particularly useful for 3D mesh. For 2D mesh, it may be more efficient to work with matplotlib using methods like: get_edges, get_border and dump2triplot.
     
-    :rtype: string
+    :param path: if None, return a string containing the VTK data. If not, must be a path to a file where the data will be written.
+    :rtype: string or None.
+    
+    .. plot:: example_code/mesh/Mesh-dump2vtk.py
+      :include-source:
+      
+    * VTK output: :download:`Mesh-dump2vtk.vtk <example_code/mesh/Mesh-dump2vtk.vtk>` 
+    * Paraview plot: 
+    
+    .. image:: example_code/mesh/Mesh-dump2vtk.png 
+    
     '''
     out = '# vtk DataFile Version 2.0\nUnstructured Grid Example\nASCII\nDATASET UNSTRUCTURED_GRID\n'
     # Nodes
@@ -1834,8 +1844,29 @@ class Mesh(object):
         if lc == 8: ecode = 12
       eTypes += pattern2.format(ecode)
     out += eTypes
-    return out
-    
+    #Fields
+    fields = self.fields
+    nfields = {} # node fields
+    efields = {} # element fields
+    for key in fields.keys():
+      if fields[key].position == "node": nfields[key] = fields[key]
+      if fields[key].position == "element": efields[key] = fields[key]
+    header = True
+    if len(nfields.keys()) != 0:
+      for key in nfields.keys():      
+        out += fields[key].dump2vtk(name = key, header = header)
+        header = False
+    header = True
+    if len(efields.keys()) != 0:
+      for key in nfields.keys():      
+        out += fields[key].dump2vtk(name = key, header = header)
+        header = False   
+    if path == None:
+      return out
+    else:
+      f = open(path, "wb")
+      f.write(out)
+      f.close()
       
       
   def dump2triplot(self):

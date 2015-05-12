@@ -1549,12 +1549,14 @@ class FieldOutput(object):
       self.data = array(self.dtf,data)
       self.labels = array(self.dti,labels)  
       
-  def dump2vtk(self,name='fieldOutput'):
+  def dump2vtk(self,name='fieldOutput', header = True):
     '''
     Converts the FieldOutput instance to VTK format which can be directly read by Mayavi2 or Paraview. This method is very useful to quickly and efficiently plot 3D mesh and fields.
     
     :param name: name used for the field in the output.
     :type name: string
+    :param header: if True, adds the location header (eg. CELL_DATA / POINT_DATA)
+    :type header: boolean
     :rtype: string
     
     .. plot:: example_code/postproc/FieldOutput-dump2vtk.py
@@ -1565,10 +1567,13 @@ class FieldOutput(object):
     .. image:: example_code/postproc/FieldOutput-dump2vtk.svg
        :width: 750
     '''
+    out = ""
     ld = len(self.data)
-    if self.position == 'node': dataType = 'POINT_DATA'
-    if self.position == 'element': dataType = 'CELL_DATA'
-    out = '{2} {0}\nSCALARS {1} float 1\nLOOKUP_TABLE default\n'.format(ld,name,dataType)
+    if header:
+      if self.position == 'node': dataType = 'POINT_DATA'
+      if self.position == 'element': dataType = 'CELL_DATA' 
+      out += "{0} {1}\n".format(dataType, ld)
+    out += 'SCALARS {0} float 1\nLOOKUP_TABLE default\n'.format(name)
     pattern = '{0}\n'
     for d in self.data:
       out += pattern.format(d)
@@ -2072,7 +2077,7 @@ class VectorFieldOutput:
       self.data3 = array(self.dtf,data3)
       self.labels = array(self.dti,labels)   
   
-  def dump2vtk(self,name='vectorFieldOutput'):
+  def dump2vtk(self,name='vectorFieldOutput', header = True):
     '''
     Converts the VectorFieldOutput instance to VTK format which can be directly read by Mayavi2 or Paraview. This method is very useful to quickly and efficiently plot 3D mesh and fields.
     
@@ -2095,9 +2100,12 @@ class VectorFieldOutput:
     '''
     d1, d2, d3 = self.data1, self.data2, self.data3
     ld = len(d1)
-    if self.position == 'node': dataType = 'POINT_DATA'
-    if self.position == 'element': dataType = 'CELL_DATA'
-    out = '{2} {0}\nVECTORS {1} float\n'.format(ld,name,dataType)
+    out = ""
+    if header:
+      if self.position == 'node': dataType = 'POINT_DATA'
+      if self.position == 'element': dataType = 'CELL_DATA' 
+      out += "{0} {1}\n".format(dataType, ld)
+    out += 'VECTORS {0} float\n'.format(name)
     pattern = '{0} {1} {2}\n'
     for i in xrange(ld):
       out += pattern.format(d1[i], d2[i], d3[i])
@@ -2420,7 +2428,7 @@ class TensorFieldOutput:
       self.data23 = array(self.dtf,data23)
       self.labels = array(self.dti,labels)   
   
-  def dump2vtk(self,name='tensorFieldOutput'):
+  def dump2vtk(self,name='tensorFieldOutput', header = True):
     '''
     Converts the TensorFieldOutput instance to VTK format which can be directly read by Mayavi2 or Paraview. This method is very useful to quickly and efficiently plot 3D mesh and fields.
     
@@ -2428,14 +2436,17 @@ class TensorFieldOutput:
     :type name: string
     :rtype: string
     
-    .. note:: this method has not been fully tested yet, bugs are probably still in.
+    
     '''
     d11, d22, d33 = self.data11, self.data22, self.data33
     d12, d13, d23 = self.data12, self.data13, self.data23
     ld = len(d11)
-    if self.position == 'node': dataType = 'POINT_DATA'
-    if self.position == 'element': dataType = 'CELL_DATA'
-    out = '{2} {0}\nTENSORS {1} float\n'.format(ld,name,dataType)
+    out = ""
+    if header:
+      if self.position == 'node': dataType = 'POINT_DATA'
+      if self.position == 'element': dataType = 'CELL_DATA' 
+      out += "{0} {1}\n".format(dataType, ld)
+    out += 'TENSORS {0} float\n'.format(name)
     pattern = '{0} {3} {4}\n{3} {1} {5}\n{4} {5} {2}\n\n'
     for i in xrange(ld):
       out += pattern.format(d11[i], d22[i], d33[i], d12[i], d13[i], d23[i])
