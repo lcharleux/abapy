@@ -867,6 +867,7 @@ class Mesh(object):
     self.name = []
     self.sets = {}
     self.surfaces = {}
+    self.fields = {}
     l = len(labels)
     if len(connectivity) != len(labels): raise Exception, 'connectivity must have the same length as labels.'
     if len(space) != len(labels): raise Exception, 'space must have the same length as labels.'
@@ -1188,6 +1189,13 @@ class Mesh(object):
       tt = ( t[0] , t[1] )
       if tt not in surf: surf.append(tt)
         
+  
+  def add_field(self, field, label):
+    """
+    Add a field to the mesh.
+    """
+    self.fields[label] = field
+    
     
   def dump2inp(self):
     '''
@@ -2183,9 +2191,12 @@ class Mesh(object):
           volume[n] = a0 + a1 + a2 + a3 + a4 + a5   
     return volume  
     
-  def dump2polygons(self):
+  def dump2polygons(self, edge_color = "black", edge_width = 1.):
     """
     Returns 2D elements as matplotlib poly collection.
+    
+    :param edge_color: edge color.
+    :param edge_width: edge width.
     
     .. plot:: example_code/mesh/Mesh-dump2polygons.py
      :include-source:
@@ -2200,8 +2211,52 @@ class Mesh(object):
     labels = n.labels
     verts = [[nodes[ labels.index(i) ] for i in c ] for c in conn]
     patches = collections.PolyCollection(verts, 
-      edgecolor = "black", linewidth = .1, facecolor = "none")
+      edgecolor = edge_color, linewidth = edge_width, facecolor = "none")
     return patches
+  
+  def draw(self, ax, field_func = None, disp_func = None, cmap = None, cmap_levels = 20, cbar_label = 'Field', cbar_orientation = 'horizontal', edge_color = "black", node_style = "k.", node_size = 1.):
+    """
+    Draws a 2D mesh in a given matplotlib axes instance.
+    
+    :param ax: matplotlib axes instance.
+    :param field_func: a function that defines how to used existing fields to produce a FieldOutput instance.
+    :type field_func: function or None
+    :param disp_func: a function that defines how to used existing fields to produce a VectorFieldOutput instance used as a diplacement field.
+    :type disp_func: function
+    :param cmap: matplotlib colormap.
+    :param cmap_levels: number of levels in the colormap
+    :param cbar_label: colorbar label.
+    :type cbar_label: string
+    :param cbar_orientation: "horizontal" or "vertical".
+    :param edge_color: valid matplotlib color for the edges of the mesh.
+    :param node_style: nodes plot style.
+    :param node_size: nodes size.
+    
+    .. plot:: example_code/mesh/Mesh-draw.py
+     :include-source:
+     
+    """
+    from matplotlib import pyplot as plt
+    mesh = copy.copy(self)
+    if disp_func != None: 
+      U = disp_func(mesh.fields)
+      mesh.nodes.apply_displacement(U)
+    patches = mesh.dump2polygons()
+    bb = mesh.nodes.boundingBox()
+    patches.set_linewidth(1.)
+    ax.set_aspect("equal")
+    if field_func != None:
+      if cmap == None:
+        from matplotlib import cm
+        cmap = cm.jet
+      X, Y, Z, tri = mesh.dump2triplot()
+      field = field_func(mesh.fields)
+      grad = ax.tricontourf(X, Y, tri, field.data, cmap_levels, cmap = cmap)
+      bar = plt.colorbar(grad, orientation = cbar_orientation)
+      bar.set_label(cbar_label)
+    ax.add_collection(patches)
+    ax.plot(mesh.nodes.x, mesh.nodes.y, node_style, markersize = 1.)
+  
   
   def node_set_to_surface(self, surface, nodeSet):
     """

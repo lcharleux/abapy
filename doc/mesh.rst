@@ -57,6 +57,7 @@ ___________________
 .. automethod:: abapy.mesh.Mesh.node_set_to_surface
 .. automethod:: abapy.mesh.Mesh.replace_node
 .. automethod:: abapy.mesh.Mesh.simplify_nodes
+.. automethod:: abapy.mesh.Mesh.add_field
 
 Useful data
 ___________________
@@ -86,6 +87,7 @@ _____________
 .. automethod:: abapy.mesh.Mesh.get_edges
 .. automethod:: abapy.mesh.Mesh.get_border
 .. automethod:: abapy.mesh.Mesh.dump2polygons
+.. automethod:: abapy.mesh.Mesh.draw
 
 Mesh generation
 ~~~~~~~~~~~~~~~
