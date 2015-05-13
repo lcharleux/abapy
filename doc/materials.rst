@@ -19,3 +19,5 @@ Elastic-plastic materials
    :members:
 .. autoclass:: abapy.materials.DruckerPrager
    :members:
+.. autoclass:: abapy.materials.Bilinear
+   :members:   

@@ -46,4 +46,20 @@ def dump(data,name,protocol = 2):
   pickle.dump(data,f,protocol)
   f.close()
 
+def read_file(path, ncol = 2, separator = None):
+  """
+  Read a tabular data file and returns a `numpy.array` containing the data. Header lines must begin with a #.
+  """
+  import numpy as np
+  lines = open(path, "rb").readlines()
+  out = []
+  for line in lines:
+    if line[0] != "#":
+      ldata = []
+      words = line.split()
+      for i in xrange(ncol):
+        ldata.append(float(words[i]))
+      out.append(ldata)
+  return np.array(out).transpose()
+  
 
