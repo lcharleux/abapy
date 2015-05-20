@@ -13,11 +13,19 @@ Abaqus Python "**AbaPy**" contains tools to build, postprocess and plot automati
 .. plot:: example_code/logo/abapy_logo.py
 
 
-.. codeauthor:: Ludovic Charleux <ludovic.charleux@univ-savoie.fr>
+Contributors:
+  * Ludovic Charleux
+  * Laurent Bizet
+  * Arnaud Faivre
+  * Moustapha Issack
+  * Vincent Keryvin
+  
      
-Cite as:
+For citation, please use the following link:
 
-.. image:: https://zenodo.org/badge/13094/lcharleux/abapy.svg   :target: http://dx.doi.org/10.5281/zenodo.17784
+.. raw:: html
+
+  <a href="http://dx.doi.org/10.5281/zenodo.17784"><img src="https://zenodo.org/badge/doi/10.5281/zenodo.17784.svg" alt="10.5281/zenodo.17784"></a>
 
 
 Installation can be performed in many ways, here a two:

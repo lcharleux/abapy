@@ -4,3 +4,4 @@ makedoc/
 doc/_build/*
 *.pdf
 *.rpy
+*.odb
