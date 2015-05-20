@@ -1,3 +1,0 @@
-from abapy‌.indentation import ContactData
-
-cd = ContactData() 
