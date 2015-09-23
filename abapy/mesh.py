@@ -368,7 +368,29 @@ class Nodes(object):
     labs = labels[out]
     if labels != []: self.add_set(name, labs)
     
+  def add_set_by_func_2D(self, name, func):
+    '''
+    Creates a node set using a function of x, y and labels (given as ``numpy.array``). Must get back a boolean array of the same size.
     
+    :param name: set label.
+    :type name: string
+    :param func: function of x, y and labels
+    :type func: function
+     
+    >>> mesh.nodes.add_set_by_func('setlabel', lambda x, y, labels: x == 0.)
+
+     '''
+    from numpy import array, float32, float64, uint32, where
+    if type(name) is not str: raise Exception, 'set labels must be strings, got {0}.'.format(type(name))
+    if self.dtf == 'f': n_dtf = float32
+    if self.dtf == 'd': n_dtf = float64
+    x = array(self.x, dtype = n_dtf)
+    y = array(self.y, dtype = n_dtf)
+    labels = array(self.labels, dtype = uint32)
+    out = func(x, y, labels)
+    out = where(out == True)[0].tolist()
+    labs = labels[out]
+    if labels != []: self.add_set(name, labs)  
   
   def translate(self,x=0.,y=0.,z=0.):
     '''
