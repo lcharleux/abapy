@@ -175,7 +175,7 @@ class DruckerPrager(object):
     return out[0:-1]
     
 class Hollomon(object):
-  ''' 
+  r''' 
   Represents von Hollom materials (i. e. power law haderning and von mises yield criterion) used for FEM simulations.
   
   :param E: Young's modulus.
@@ -186,16 +186,30 @@ class Hollomon(object):
   :type sy: float, list, array.array
   :param n: hardening exponent
   :type sy: float, list, array.array
+  :param kind: kind of equation to be used (see below). Default is 1.
+  :type kind: int  
   
   .. note:: 
      All inputs must have the same length or an exception will be raised.
+  
+  Several sets of equations are refered to as Hollomon stress-strain law. In all cases, we the strain decomposition :math:`\epsilon = \epsilon_e + \epsilon_p`  is used and the elastic part is described by :math:`\sigma = E \epsilon_e = E \epsilon`. Only the plastic parts (i. e. :math:`\sigma > \sigma_y`) differ:
+  
+  * kind 1: 
+  
+  .. math::
+  
+     \sigma = \sigma_y \left( \epsilon E / \sigma_y \right)^n
+  
+  * kind 2:
     
+  .. math::
+  
+     \sigma = \sigma_y \left( 1 + \epsilon_p \right)^n = E \epsilon_e 
+       
   .. plot:: example_code/materials/Hollomon.py
     :include-source:   
-  
-  
   '''
-  def __init__(self, labels='mat', E = 1., nu = 0.3, sy = 0.01, n = 0.2, dtf='d'):
+  def __init__(self, labels='mat', E = 1., nu = 0.3, sy = 0.01, n = 0.2, kind = 1, dtf='d'):
     from array import array
     import numpy
     if type(labels) is str: labels=[labels]
@@ -213,14 +227,16 @@ class Hollomon(object):
     n = float_arg(n)
     if len(n) != l: raise Exception, 'Parameters must all have the same length'
     self.n=array(dtf,n)
+    self.kind = kind
   def __repr__(self):
     return '<Hollomon instance: {0} samples>'.format(len(self.E))
   
-  def get_table(self, position, eps_max = 10., N = 100):
+  def get_table(self, position=0, eps_max = 10., N = 100):
     '''
     Returns the tabular data corresponding to the tensile stress strain law using log spacing.
-    
-    :param eps_max: maximum strain to be computed.
+    :param position: indice of the concerned material (default is 0).
+    :type position: int
+    :param eps_max: maximum strain to be computed. If kind is 1, eps_max is the total strain, if kind is 2, eps_max is the plastic strain.
     :type eps_max: float
     :param N: number of points to be computed.
     :type N: int
@@ -230,10 +246,17 @@ class Hollomon(object):
     sy = self.sy[position]
     E = self.E[position]
     n = self.n[position]
-    ey = sy/E
-    s = 10.**np.linspace(0., np.log10(eps_max/ey), N, endpoint = True)
-    eps = ey * s
-    sigma = sy * s**n
+    if self.kind == 1:
+      ey = sy/E
+      s = 10.**np.linspace(0., np.log10(eps_max/ey), N, endpoint = True)
+      eps = ey * s
+      sigma = sy * s**n
+    if self.kind == 2:
+      #eps_p = np.logspace(0., np.log10(eps_max +1.), N) -1.
+      s = np.linspace(0., eps_max**n, N)
+      eps_p = s**(1/n)
+      sigma = sy * (1. + s)
+      eps = eps_p + sigma / E
     return np.array([eps, sigma]).transpose()
       
   def dump2inp(self, eps_max = 10., N = 100):
