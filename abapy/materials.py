@@ -337,12 +337,12 @@ class Bilinear(object):
     :rtype: string
     '''
     out = '** {0}\n'.format(self.__repr__())
-    pattern = '*MATERIAL, NAME={0}\n*ELASTIC\n  {1}, {2}\n*PLASTIC\n  {3}, 0.\n {4}, {5}'
+    pattern = '*MATERIAL, NAME={0}\n*ELASTIC\n  {1}, {2}\n*PLASTIC\n  {3}, 0.\n {4}, {5} \n'
     Eps_p_sat=[]
     for i in xrange(len(self.E)):
         Eps_p_sat.append(abs(self.Ssat[i] - self.sy[i])/self.n[i])
         if self.sy[i] > self.Ssat[i]:
-            self.sy[i]=self.Ssat[i]   
+          self.sy[i] = self.Ssat[i]   
         out += pattern.format(self.labels[i],self.E[i],self.nu[i],self.sy[i], self.Ssat[i], Eps_p_sat[i])
     return out[0:-1]    
 
