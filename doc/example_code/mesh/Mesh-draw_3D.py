@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.patches as patches
 import matplotlib.collections as collections
+import mpl_toolkits.mplot3d as a3
 import numpy as np
 from matplotlib import cm
 from scipy import interpolate

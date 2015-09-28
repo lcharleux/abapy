@@ -2244,27 +2244,95 @@ class Mesh(object):
           volume[n] = a0 + a1 + a2 + a3 + a4 + a5   
     return volume  
     
-  def dump2polygons(self, edge_color = "black", edge_width = 1.):
+    
+  def vertices(self, use_3D = False):
+    """
+    Returns the vertices that can be used to plot the mesh.
+    """
+    import numpy as np
+    n = self.nodes
+    conn = np.array(self.connectivity)
+    space = np.array(self.space)
+    labels = n.labels
+    conn2D = conn[np.where(space == 2)[0]]
+    conn3D = conn[np.where(space == 3)[0]]
+    if use_3D == False:
+      nodes = np.array([n.x, n.y]).transpose()
+      verts = [[nodes[ labels.index(i) ] for i in c ] for c in conn2D]
+    else: 
+      def order_conn(c):
+        c = np.array(c)
+        m = c.min()
+        p = np.where(c == m)[0][0]
+        n = len(c)
+        o = np.arange(n)
+        c = c[o-n+p]
+        if c[-1] < c[1]: c = c[-o]
+        return c.tolist()
+      nodes = np.array([n.x, n.y, n.z]).transpose()
+      faces = []
+      for c in conn3D:
+        if len(c) == 8: # HEXAHEDRON
+          local_faces = [
+          [0,1,2,3],
+          [0,4,5,1],
+          [4,7,6,5],
+          [7,3,2,6],
+          [1,5,6,2],
+          [0,4,7,3],]
+        for lf in local_faces:
+          fc = order_conn([c[i] for i in lf])
+          fc = [labels.index(p) for p in fc]
+          if fc in faces:
+            loc = faces.index(fc)
+            faces.pop(loc)
+          else:
+            faces.append(fc)
+      verts = [[nodes[i ] for i in c ] for c in faces]      
+    return verts
+    
+  def dump2polygons(self, edge_color = "black", edge_width = 1., face_color = None, use_3D = False):
     """
     Returns 2D elements as matplotlib poly collection.
     
     :param edge_color: edge color.
     :param edge_width: edge width.
+    :param face_color: face color.
+    :param use_3D: True for 3D polygon export.
     
     .. plot:: example_code/mesh/Mesh-dump2polygons.py
+     :include-source:
+    
+    .. plot:: example_code/mesh/Mesh-dump2polygons_3D.py
      :include-source:
     
     """  
     from matplotlib import cm
     import numpy as np
     import matplotlib.collections as collections
-    n = self.nodes
-    nodes = np.array([n.x, n.y]).transpose()
-    conn = np.array(self.connectivity)
-    labels = n.labels
-    verts = [[nodes[ labels.index(i) ] for i in c ] for c in conn]
-    patches = collections.PolyCollection(verts, 
-      edgecolor = edge_color, linewidth = edge_width, facecolor = "none")
+    verts = self.vertices(use_3D = use_3D)
+    if use_3D == False:
+      if face_color == None:
+        patches = collections.LineCollection(verts, 
+                            color = edge_color, 
+                            linewidth = edge_width) 
+                            
+      else:
+        patches = collections.PolyCollection(verts, 
+                            edgecolor = edge_color, 
+                            linewidth = edge_width, 
+                            facecolor = face_color)                      
+    else:
+      import mpl_toolkits.mplot3d as a3 
+      if face_color == None:
+        patches = a3.art3d.Line3DCollection(verts,
+                           edgecolor = edge_color, 
+                           linewidth = edge_width)   
+      else:
+        patches = a3.art3d.Poly3DCollection(verts,
+                           edgecolor = edge_color, 
+                           linewidth = edge_width, 
+                           facecolor = face_color)                        
     return patches
   
   def draw(self, ax, field_func = None, disp_func = None, cmap = None, cmap_levels = 20, cbar_label = 'Field', cbar_orientation = 'horizontal', edge_color = "black", edge_width = 1., node_style = "k.", node_size = 1., contour = False, contour_colors = "black", alpha = 1.):
