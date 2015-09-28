@@ -2267,7 +2267,7 @@ class Mesh(object):
       edgecolor = edge_color, linewidth = edge_width, facecolor = "none")
     return patches
   
-  def draw(self, ax, field_func = None, disp_func = None, cmap = None, cmap_levels = 20, cbar_label = 'Field', cbar_orientation = 'horizontal', edge_color = "black", node_style = "k.", node_size = 1.):
+  def draw(self, ax, field_func = None, disp_func = None, cmap = None, cmap_levels = 20, cbar_label = 'Field', cbar_orientation = 'horizontal', edge_color = "black", edge_width = 1., node_style = "k.", node_size = 1., contour = False, contour_colors = "black", alpha = 1.):
     """
     Draws a 2D mesh in a given matplotlib axes instance.
     
@@ -2296,7 +2296,8 @@ class Mesh(object):
       mesh.nodes.apply_displacement(U)
     patches = mesh.dump2polygons()
     bb = mesh.nodes.boundingBox()
-    patches.set_linewidth(1.)
+    patches.set_linewidth(edge_width)
+    patches.set_edgecolor(edge_color)
     ax.set_aspect("equal")
     if field_func != None:
       if cmap == None:
@@ -2304,9 +2305,11 @@ class Mesh(object):
         cmap = cm.jet
       X, Y, Z, tri = mesh.dump2triplot()
       field = field_func(mesh.fields)
-      grad = ax.tricontourf(X, Y, tri, field.data, cmap_levels, cmap = cmap)
+      grad = ax.tricontourf(X, Y, tri, field.data, cmap_levels, cmap = cmap, alpha = alpha)
       bar = plt.colorbar(grad, orientation = cbar_orientation)
       bar.set_label(cbar_label)
+      if contour:
+        ax.tricontour(X, Y, tri, field.data, cmap_levels, colors = contour_colors)   
     ax.add_collection(patches)
     ax.plot(mesh.nodes.x, mesh.nodes.y, node_style, markersize = 1.)
   
