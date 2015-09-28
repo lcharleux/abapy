@@ -2282,12 +2282,17 @@ class Mesh(object):
     :type cbar_label: string
     :param cbar_orientation: "horizontal" or "vertical".
     :param edge_color: valid matplotlib color for the edges of the mesh.
+    :param edge_width: mesh edge width.
     :param node_style: nodes plot style.
     :param node_size: nodes size.
+    :param contour: plot field contour.
+    :type contour: boolean
+    :param contour_colors: contour colors to use, colormap of fixed color.
+    :param alpha: alpha lvl of the gradiant plot.
     
     .. plot:: example_code/mesh/Mesh-draw.py
      :include-source:
-     
+    
     """
     from matplotlib import pyplot as plt
     mesh = copy.copy(self)

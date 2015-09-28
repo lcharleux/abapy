@@ -42,7 +42,12 @@ m.draw(ax,
     disp_func  = lambda fields : fields["u"],
     field_func = lambda fields : fields["f"],
     cmap = cm.jet,
-    cbar_orientation = "vertical")
+    cbar_orientation = "vertical",
+    contour = True,
+    contour_colors = "black",
+    alpha = .75,
+    cmap_levels = 10,
+    edge_width = .1)
 ax.set_aspect("equal")
 plt.grid()
 plt.xlabel("$x$ position")
