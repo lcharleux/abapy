@@ -1891,7 +1891,7 @@ class Mesh(object):
       f.close()
       
       
-  def dump2triplot(self):
+  def dump2triplot(self, use_3D = False):
     '''
     Allows any 2D mesh to be triangulized and formated in a suitable way to be used by triplot, tricontour and tricontourf in matplotlib.pyplot. This is the best way to produce clean 2D plots of 2D meshs. Returns 4 arrays/lists: x, y and z coordinates of nodes and triangles connectivity. It can be directly used in matplotlib.pyplot using:
     
@@ -1909,17 +1909,67 @@ class Mesh(object):
     from array import array
     import numpy as np
     from copy import copy
-    dti = self.dti
-    m3 = self.convert2tri3()
-    c0 = m3.connectivity
-    ni = m3.nodes.labels.index
-    c = []
-    for t0 in c0:
-      t = array(dti,[])
-      for n in t0:
-        t.append(ni(n))
-      c.append(copy(t))
-    return np.array(m3.nodes.x), np.array(m3.nodes.y), np.array(m3.nodes.x), np.array(c)
+    if use_3d == False:
+      dti = self.dti
+      m3 = self.convert2tri3()
+      c0 = m3.connectivity
+      ni = m3.nodes.labels.index
+      c = []
+      for t0 in c0:
+        t = array(dti,[])
+        for n in t0:
+          t.append(ni(n))
+        c.append(copy(t))
+      return np.array(m3.nodes.x), np.array(m3.nodes.y), np.array(m3.nodes.x), np.array(c)
+    else:
+      n = self.nodes
+      conn = np.array(self.connectivity)
+      space = np.array(self.space)
+      labels = n.labels
+      conn2D = conn[np.where(space == 2)[0]]
+      conn3D = conn[np.where(space == 3)[0]]
+      if use_3D == False:
+        nodes = np.array([n.x, n.y]).transpose()
+        verts = [[nodes[ labels.index(i) ] for i in c ] for c in conn2D]
+      else: 
+        def order_conn(c):
+          c = np.array(c)
+          m = c.min()
+          p = np.where(c == m)[0][0]
+          n = len(c)
+          o = np.arange(n)
+          c = c[o-n+p]
+          if c[-1] < c[1]: c = c[-o]
+          return c.tolist()
+        nodes = np.array([n.x, n.y, n.z]).transpose()
+        faces = []
+        for c in conn3D:
+          if len(c) == 8: # HEXAHEDRON
+            local_faces = [
+            [0,1,2],
+            [3,2,1],
+            [0,4,1],
+            [1,5,4],
+            [4,7,6],
+            [6,5,4],
+            [7,3,2],
+            [2,6,7],
+            [1,2,6],
+            [6,5,1],
+            [0,3,7],
+            [7,4,0]]
+            
+          for lf in local_faces:
+            fc = order_conn([c[i] for i in lf])
+            fc = [labels.index(p) for p in fc]
+            if fc in faces:
+              loc = faces.index(fc)
+              faces.pop(loc)
+            else:
+              faces.append(fc)
+          
+      return np.array(self.nodes.x), np.array(self.nodes.y), np.array(self.nodes.z), np.array(faces) 
+        
   
   def replace_node(self, old, new):
     '''
@@ -2245,7 +2295,7 @@ class Mesh(object):
     return volume  
     
     
-  def vertices(self, use_3D = False):
+  def faces(self, use_3D = False):
     """
     Returns the vertices that can be used to plot the mesh.
     """
@@ -2280,6 +2330,13 @@ class Mesh(object):
           [7,3,2,6],
           [1,5,6,2],
           [0,4,7,3],]
+        if len(c) == 6: # PRISM
+          local_faces = [
+          [0,1,2],
+          [3,4,5],
+          [0,1,4,3],
+          [1,2,5,4],
+          [0,2,5,3],]  
         for lf in local_faces:
           fc = order_conn([c[i] for i in lf])
           fc = [labels.index(p) for p in fc]
@@ -2310,7 +2367,7 @@ class Mesh(object):
     from matplotlib import cm
     import numpy as np
     import matplotlib.collections as collections
-    verts = self.vertices(use_3D = use_3D)
+    verts = self.faces(use_3D = use_3D)
     if use_3D == False:
       if face_color == None:
         patches = collections.LineCollection(verts, 
