@@ -798,7 +798,7 @@ def GetTensorFieldOutput(odb, step, frame, instance, position, field, labels=Non
     return TensorFieldOutput(position = position, data11 = Field[0], data22 = Field[1], data33 = Field[2], data12 = Field[3], data13 = Field[4], data23 = Field[5])  
 
 
-def MakeFieldOutputReport(odb, instance, step, frame, report_name, original_position, new_position, field, sub_field = None, sub_set_type = None, sub_set = None):
+def MakeFieldOutputReport(odb, instance, step, frame, report_name, original_position, new_position, field, sub_field = None, sub_field_prefix = None, sub_set_type = None, sub_set = None):
   '''
   Writes a field output report using Abaqus. The major interrest of this function is that it is really fast compared to ``GetFieldOutput`` which tends to get badly slow on odbs containing more than 1500 elements. One other interrest is that it doesn't require to used ``position = nodes`` option in the INP file to evaluate fields at nodes. It is especially efficient when averaging is necessary (example: computing stress at nodes). The two drawbacks are that it requires ``abaqus viewer`` (or ``cae``) using the ``-noGUI`` where GetFieldOutput only requires ``abaqus python`` so it depends on the license server lag (which can be of several seconds). The second drawback is that it requires to write a file in place where you have write permission. This function is made to used in conjunction with ``ReadFieldOutputReport``. 
   
@@ -937,9 +937,14 @@ def MakeFieldOutputReport(odb, instance, step, frame, report_name, original_posi
   variable.append(original_abqposition)
   if type(step) == str: step = odb.steps.keys().index(step) 
   if sub_field != None:
+    if sub_field_prefix == None:
+      prefix = field
+    else:
+      prefix = sub_field_prefix  
     if type(sub_field) == int:
       sub_field_type = COMPONENT
-      sub_field_flag = field+str(sub_field) 
+      sub_field_flag = prefix+str(sub_field)
+      print sub_field_flag 
     if type(sub_field) == str:
       sub_field_type = INVARIANT
       sub_field_flag = sub_field
@@ -951,7 +956,7 @@ def MakeFieldOutputReport(odb, instance, step, frame, report_name, original_posi
       leaf = dgo.LeafFromNodeSets(instance + '.' + sub_set)
     if sub_set_type == 'element':
       leaf = dgo.LeafFromElementSets(instance + '.' + sub_set)
-  
+  print variable
   if frame < 0:
     frames_list = xrange(len(odb.steps[ odb.steps.keys()[step] ].frames))
     frame = frames_list[frame]
@@ -1080,7 +1085,7 @@ def ReadFieldOutputReport(report_name, position = 'node', dti = 'I', dtf = 'f'):
   return FieldOutput(labels = labels, data = values, position = position, dti = dti, dtf = dtf)      
 
 
-def GetFieldOutput_byRpt(odb, instance, step, frame, original_position, new_position, position, field, sub_field = None, sub_set_type = None, sub_set = None, report_name = 'dummy.rpt', dti= 'I', dtf = 'f', delete_report = True):
+def GetFieldOutput_byRpt(odb, instance, step, frame, original_position, new_position, position, field, sub_field = None, sub_field_prefix = None, sub_set_type = None, sub_set = None, report_name = 'dummy.rpt', dti= 'I', dtf = 'f', delete_report = True):
   '''
   Wraps ``MakeFieldOutputReport`` and ``ReadFieldOutputReport`` in a single function to mimic the behavior ``GetFieldOutput``.
   
@@ -1145,7 +1150,8 @@ def GetFieldOutput_byRpt(odb, instance, step, frame, original_position, new_posi
     original_position = original_position, 
     new_position = new_position, 
     field = field, 
-    sub_field = sub_field, 
+    sub_field = sub_field,
+    sub_field_prefix = sub_field_prefix, 
     sub_set_type = sub_set_type, 
     sub_set = sub_set)
   field = ReadFieldOutputReport(
@@ -1160,7 +1166,7 @@ def GetFieldOutput_byRpt(odb, instance, step, frame, original_position, new_posi
       pass  
   return field
 
-def GetVectorFieldOutput_byRpt(odb, instance, step, frame, original_position, new_position, position, field, sub_set_type = None, sub_set = None, report_name = 'dummy.rpt', dti= 'I', dtf = 'f', delete_report = True):
+def GetVectorFieldOutput_byRpt(odb, instance, step, frame, original_position, new_position, position, field, sub_field_prefix = None, sub_set_type = None, sub_set = None, report_name = 'dummy.rpt', dti= 'I', dtf = 'f', delete_report = True):
   '''
   Uses ``GetFieldOutput_byRpt`` to produce VectorFieldOutput. 
   
@@ -1221,7 +1227,8 @@ def GetVectorFieldOutput_byRpt(odb, instance, step, frame, original_position, ne
   original_position = original_position, 
   new_position = new_position, 
   position = position,
-  field = field, 
+  field = field,
+  sub_field_prefix = sub_field_prefix, 
   sub_field = 1, 
   sub_set_type = sub_set_type, 
   sub_set = sub_set,
@@ -1237,7 +1244,8 @@ def GetVectorFieldOutput_byRpt(odb, instance, step, frame, original_position, ne
   original_position = original_position, 
   new_position = new_position, 
   position = position,
-  field = field, 
+  field = field,
+  sub_field_prefix = sub_field_prefix,  
   sub_field = 2, 
   sub_set_type = sub_set_type, 
   sub_set = sub_set,
@@ -1259,7 +1267,8 @@ def GetVectorFieldOutput_byRpt(odb, instance, step, frame, original_position, ne
     original_position = original_position, 
     new_position = new_position, 
     position = position,
-    field = field, 
+    field = field,
+    sub_field_prefix = sub_field_prefix,  
     sub_field = 3, 
     sub_set_type = sub_set_type, 
     sub_set = sub_set,
@@ -1284,7 +1293,7 @@ def GetVectorFieldOutput_byRpt(odb, instance, step, frame, original_position, ne
   return vector_field
   
 
-def GetTensorFieldOutput_byRpt(odb, instance, step, frame, original_position, new_position, position, field, sub_set_type = None, sub_set = None, report_name = 'dummy.rpt', dti= 'I', dtf = 'f', delete_report = True):
+def GetTensorFieldOutput_byRpt(odb, instance, step, frame, original_position, new_position, position, field, sub_field_prefix = None, sub_set_type = None, sub_set = None, report_name = 'dummy.rpt', dti= 'I', dtf = 'f', delete_report = True):
   '''
   Uses ``GetFieldOutput_byRpt`` to produce TensorFieldOutput. 
   
@@ -1346,7 +1355,8 @@ def GetTensorFieldOutput_byRpt(odb, instance, step, frame, original_position, ne
   original_position = original_position, 
   new_position = new_position, 
   position = position,
-  field = field, 
+  field = field,
+  sub_field_prefix = sub_field_prefix,  
   sub_field = 11, 
   sub_set_type = sub_set_type, 
   sub_set = sub_set,
@@ -1363,6 +1373,7 @@ def GetTensorFieldOutput_byRpt(odb, instance, step, frame, original_position, ne
   new_position = new_position, 
   position = position,
   field = field, 
+  sub_field_prefix = sub_field_prefix, 
   sub_field = 22, 
   sub_set_type = sub_set_type, 
   sub_set = sub_set,
@@ -1379,6 +1390,7 @@ def GetTensorFieldOutput_byRpt(odb, instance, step, frame, original_position, ne
   new_position = new_position, 
   position = position,
   field = field, 
+  sub_field_prefix = sub_field_prefix, 
   sub_field = 33, 
   sub_set_type = sub_set_type, 
   sub_set = sub_set,
@@ -1395,6 +1407,7 @@ def GetTensorFieldOutput_byRpt(odb, instance, step, frame, original_position, ne
   new_position = new_position, 
   position = position,
   field = field, 
+  sub_field_prefix = sub_field_prefix, 
   sub_field = 12, 
   sub_set_type = sub_set_type, 
   sub_set = sub_set,
@@ -1418,6 +1431,7 @@ def GetTensorFieldOutput_byRpt(odb, instance, step, frame, original_position, ne
     new_position = new_position, 
     position = position,
     field = field, 
+    sub_field_prefix = sub_field_prefix, 
     sub_field = 13, 
     sub_set_type = sub_set_type, 
     sub_set = sub_set,
@@ -1434,6 +1448,7 @@ def GetTensorFieldOutput_byRpt(odb, instance, step, frame, original_position, ne
     new_position = new_position, 
     position = position,
     field = field, 
+    sub_field_prefix = sub_field_prefix, 
     sub_field = 23, 
     sub_set_type = sub_set_type, 
     sub_set = sub_set,
