@@ -1,4 +1,0 @@
-from abapy.mesh import RegularQuadMesh
-
-m = RegularQuadMesh()
-m2 = m.sweep()

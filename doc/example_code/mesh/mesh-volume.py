@@ -1,4 +1,4 @@
-from abapy.future import Mesh, parseInp, writeInp, writeMsh, Node, Tri3, Quad4
+from abapy.mesh import Mesh, parseInp, writeInp, writeMsh, Node, Tri3, Quad4
 import numpy as np
 
 m = Mesh()
