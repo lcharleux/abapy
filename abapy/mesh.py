@@ -895,12 +895,12 @@ class Mesh(object):
     if len(space) != len(labels): raise Exception, 'space must have the same length as labels.'
     if len(name) != len(labels): raise Exception, 'if not None, name must have the same length as labels.'
     for i in xrange(len(labels)):
-      self.add_element(labels[i],connectivity[i],space[i],name[i])
+      self.add_element(label = labels[i],connectivity = connectivity[i],space = space[i],name = name[i])
     if type(sets) is not dict: raise Exception, 'sets type must be dict.'
     for k in sets.keys():
       self.add_set(k, sets[k])
     for k in surfaces.keys():
-      self.add_surface(k, surface[k])
+      self.add_surface(k, surfaces[k])
   
   def __getitem__(self,s):
     from array import array
@@ -1028,7 +1028,6 @@ class Mesh(object):
     if space not in [1,2,3]: raise Exception, 'space must be 1,2 or 3'
     if name == None: name = ''
     if type(name) is not str: raise Exception, 'name type must be str'  
-    
     # inputs processing
     if label in self.labels: 
       print 'Info: element {0} already exists, nothing changed.'.format(label)
