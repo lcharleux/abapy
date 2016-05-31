@@ -98,8 +98,7 @@ class Element(object):
     self.conn = np.asarray(conn[:self._nvert], dtype = np.uint32)
     self.master = master
     self.sets = set(sets)
-    ns = self.ns()
-    self.surfaces = [set() for i in xrange(ns)]
+    self.surfaces = [set() for i in xrange(self.ns())]
     if surfaces != None:
       for k in surfaces.keys():
         self.surfaces[k].add( surfaces[k] ) 
@@ -200,14 +199,17 @@ class Element(object):
     else:
       return self.simplex_decomposition()              
   
-  def node_set_to_surface(self, nodesetlabel, surfacelabel):
-    nodelabels = set([k for k in self.nodes.keys() if label in self.nodes[k].sets])
-    for element in self.elements.values:
-      for i in xrange(self.ns()):
-        if self._space == 3: surfconn = self.conn[self._faces_conn[i]]
-        # TO be completed
-        if nodelabels.issuperset(surfconn):
-          self.surfaces[i].add(surfacelabel)
+  def node_set_to_surface(self, nodelabels, surfacelabel):
+    if self._space == 3: 
+      surfconn = self.faces()
+    elif self._space == 2: 
+      surfconn = self.edges()
+    else:
+      return
+    for i in xrange(self.ns()):
+      s = surfconn[i]
+      if nodelabels.issuperset(s):
+        self.surfaces[i].add(surfacelabel)
   
   def volume(self, add = True):
     vertices = np.array([self.master.nodes[l].coords for l in self.conn ])
@@ -515,7 +517,13 @@ class Mesh(object):
         for newel in newels:
           newmesh.elements[label] = newel
           label += 1
-    return newmesh           
+    return newmesh
+  
+  def node_set_to_surface(self, nodesetlabel, surfacelabel):
+    nodelabels = set([k for k in self.nodes.keys() 
+                      if nodesetlabel in self.nodes[k].sets])
+    for element in self.elements.values():
+      element.node_set_to_surface(nodelabels, surfacelabel)             
 #-------------------------------------------------------------------------------
 # Parsers & writers
 
@@ -612,6 +620,16 @@ def parseInp(path):
   return m
   
 def writeInp(mesh, mapping, path = None):
+  """
+  Translates the mesh instance to INP (Abaqus) format.
+  
+  :param mapping: A mapping of Abapy's element type to ad. hoc. Abaqus element types.
+  :type mapping: dict
+  
+  :param path: path to the file. If None, a string is returned.
+  :type path: str
+  
+  """
   
   def exportset(s, d):
     out = ""
@@ -650,6 +668,13 @@ def writeInp(mesh, mapping, path = None):
 
 
 def writeMsh(mesh, path = None):
+  """
+  Translates the mesh instance to (G)MSH format.
+  
+  :param path: path to the file. If None, a string is returned.
+  :type path: str
+  """
+  
   elementMap = {"Tri3":  2, 
                 "Quad4": 3, 
                 "Tetra4":4, 
@@ -664,7 +689,7 @@ def writeMsh(mesh, path = None):
                        "$EndNodes",
                        "$Elements",
                        "{1}",
-                       "$EndElement"])
+                       "$EndElements"])
   nodeout = "{0}\n".format(len(mesh.nodes.keys()))
   nodelist = []
   for k in mesh.nodes.keys():
