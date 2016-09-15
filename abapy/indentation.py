@@ -2073,7 +2073,38 @@ class ContactData:
     Returns the minimum pressure.
     '''
     return min(self.pressure)
+  
+  def contact_radius(self, zero_pressure = 0.):
+    """
+    Returns the contact radius in 2D cases, nan otherwise.
+    """
+    import numpy as np
+    if self.is_3D: 
+      return np.nan
+    else:
+      r = np.array(self.coor1)
+      z = np.array(self.altitude)
+      p = np.array(self.pressure)
+      loc = np.where(p>zero_pressure)[0]
+      rc = r[loc].max()
+      return rc
+   
+  def contact_height(self, zero_pressure = 0.):
+    """
+    Returns the contact heigth in 2D cases, nan otherwise.
+    """
+    import numpy as np
+    if self.is_3D: 
+      return np.nan
+    else:
+      r = np.array(self.coor1)
+      z = np.array(self.altitude)
+      p = np.array(self.pressure)
+      loc = np.where(p>zero_pressure)[0]
+      hc = z[loc].max()
+      return hc     
 
+    
 
 def Get_ContactData(odb, instance, node_set):
   '''
