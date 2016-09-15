@@ -2086,12 +2086,15 @@ class ContactData:
       z = np.array(self.altitude)
       p = np.array(self.pressure)
       loc = np.where(p>zero_pressure)[0]
-      rc = r[loc].max()
-      return rc
-   
+      if len(loc) != 0:
+        rc = r[loc].max()
+        return rc
+      else:
+        return np.nan
+      
   def contact_height(self, zero_pressure = 0.):
     """
-    Returns the contact heigth in 2D cases, nan otherwise.
+    Returns the contact height in 2D cases, nan otherwise.
     """
     import numpy as np
     if self.is_3D: 
@@ -2101,8 +2104,11 @@ class ContactData:
       z = np.array(self.altitude)
       p = np.array(self.pressure)
       loc = np.where(p>zero_pressure)[0]
-      hc = z[loc].max()
-      return hc     
+      if len(loc) != 0:
+        hc = z[loc].max()
+        return hc
+      else:
+        return np.nan       
 
     
 
