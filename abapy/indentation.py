@@ -2025,14 +2025,22 @@ class ContactData:
     else:
       r = np.array(self.coor1)
       p = np.array(self.pressure)
+      rc = np.where(p > 0., r, 0.).max()
+      Ac = np.pi * rc**2  
+      return Ac
+      """
       loc = r.argsort()
       r = r[loc]
       p = p[loc]
-      loc = np.where(p !=0.)[0].max()
-      rc = r[loc]
-      Ac = np.pi * rc**2  
-      return Ac
-    
+      loc2 = (p != 0.)
+      if len(loc2) == 0:
+        return 0.
+      else:  
+        loc = np.where(loc2)[0].max()
+        rc = r[loc]
+        Ac = np.pi * rc**2  
+        return Ac
+      """
   def contact_contour(self, delaunay_disp = None):
     '''
     Returns the contour of the contact zone.
@@ -2090,7 +2098,7 @@ class ContactData:
         rc = r[loc].max()
         return rc
       else:
-        return np.nan
+        return 0.
       
   def contact_height(self, zero_pressure = 0.):
     """
@@ -2105,11 +2113,22 @@ class ContactData:
       p = np.array(self.pressure)
       loc = np.where(p>zero_pressure)[0]
       if len(loc) != 0:
-        hc = z[loc].max()
+        hc = z[loc].max() - z.min()
         return hc
       else:
-        return np.nan       
+        return 0.     
 
+  def max_altitude_radius(self):
+    '''
+    Returns the minimum altitude.
+    '''
+    import numpy as np
+    r = np.array(self.coor1)
+    z = np.array(self.altitude)
+    zm = z.max()
+    rm = r[np.where(z == zm)[0][0]]
+    return rm
+    
     
 
 def Get_ContactData(odb, instance, node_set):
