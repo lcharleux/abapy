@@ -1318,7 +1318,7 @@ U
 ALLFD, ALLWK
 *ENERGY OUTPUT, ELSET=I_SAMPLE.ALL_ELEMENTS
 ALLPD, ALLSE
-*ENERGY OUTPUT, ELSET=I_INDENTER.INDENTER_ELEMENTS
+*ENERGY OUTPUT, ELSET=I_INDENTER.ALL_ELEMENTS
 ALLPD, ALLSE
 *CONTACT OUTPUT
 CAREA
@@ -2093,9 +2093,16 @@ class ContactData:
       r = np.array(self.coor1)
       z = np.array(self.altitude)
       p = np.array(self.pressure)
+      # ugly hack (2016-10-19)
+      order = np.argsort(r)
+      r = r[order]
+      z = z[order]
+      p = p[order]
+      # ...
       loc = np.where(p>zero_pressure)[0]
-      if len(loc) != 0:
-        rc = r[loc].max()
+      if len(loc) > 0:
+        loc = loc.max()
+        rc = r[loc +1]
         return rc
       else:
         return 0.
@@ -2112,8 +2119,16 @@ class ContactData:
       z = np.array(self.altitude)
       p = np.array(self.pressure)
       loc = np.where(p>zero_pressure)[0]
-      if len(loc) != 0:
-        hc = z[loc].max() - z.min()
+      # ugly hack (2016-10-19)
+      order = np.argsort(r)
+      r = r[order]
+      z = z[order]
+      p = p[order]
+      # ...
+      loc = np.where(p>zero_pressure)[0]
+      if len(loc) > 0:
+        loc = loc.max()
+        hc = z[loc +1] - z.min()
         return hc
       else:
         return 0.     
