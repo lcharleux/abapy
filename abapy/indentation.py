@@ -2101,8 +2101,7 @@ class ContactData:
       # ...
       loc = np.where(p>zero_pressure)[0]
       if len(loc) > 0:
-        loc = loc.max()
-        rc = r[loc +1]
+         rc = x[loc].max() 
         return rc
       else:
         return 0.
@@ -2127,8 +2126,7 @@ class ContactData:
       # ...
       loc = np.where(p>zero_pressure)[0]
       if len(loc) > 0:
-        loc = loc.max()
-        hc = z[loc +1] 
+        hc = z[loc].max() 
         return hc
       else:
         return 0.     
